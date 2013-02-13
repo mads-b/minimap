@@ -1,8 +1,7 @@
-package com.example.minimap;
+package com.eit.minimap;
 
 import android.app.Activity;
 import android.os.Bundle;
-import com.google.android.gms.maps.MapFragment;
 
 public class MapActivity extends Activity {
     /**

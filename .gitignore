@@ -13,6 +13,9 @@ bin/
 gen/
 
 # Local configuration file (sdk path, etc)
-*.properties
+local.properties
 .idea
+.settings
 *.iml
+.classpath
+.project
