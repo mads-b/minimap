@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">minimap</string>
+  <string name="gps_disabled">GPS is disabled in settings. Please enable it.</string>
+  <string name="first_gps_fix">Got a fix on your current GPS position!</string>
 </resources>
