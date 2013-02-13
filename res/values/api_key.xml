@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Once you have downloaded this file, put it in your .gitignore file,
+as every developer on this project MUST have his own API key. -->
+<resources>
+  <string name="apiKey">AIzaSyAnE6IAYbv3VG5AeIoX8Zze2ezPggJ1_yM</string>
+</resources>
