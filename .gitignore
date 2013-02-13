@@ -1,0 +1,19 @@
+*.class
+
+# IntelliJ metafiles
+*.iml
+*.ipr
+*.iws
+*.log
+.sonar*
+.gitignore
+
+.settings/
+.classpath
+.project
+.idea/
+
+bin/
+out/
+target/
+logs/
