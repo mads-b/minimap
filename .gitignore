@@ -12,11 +12,9 @@
 .classpath
 .project
 .idea/
-.metadata/
 
 bin/
 out/
 target/
 logs/
 gen/
-
