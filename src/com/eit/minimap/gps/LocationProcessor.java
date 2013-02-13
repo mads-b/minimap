@@ -10,6 +10,10 @@ import android.os.Bundle;
 import android.widget.Toast;
 import com.eit.minimap.R;
 
+/**
+ * Main class for getting GPS coordinates of device position.
+ * To use: Instantiate -> initializeProvider() -> startProvider().
+ */
 public class LocationProcessor implements LocationListener {
     private boolean displayedLocationProviderSelectionScreen = false;
     final GpsStatus status = null;
