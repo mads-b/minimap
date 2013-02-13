@@ -12,6 +12,7 @@
 .classpath
 .project
 .idea/
+.metadata/
 
 bin/
 out/
