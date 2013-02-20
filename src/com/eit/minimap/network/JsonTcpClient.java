@@ -45,15 +45,11 @@ public class JsonTcpClient {
      * @throws java.io.IOException If host cannot be reached
      */
     public void start() throws IOException {
-        try {
-            socket = new Socket(address,port);
-            //Make reader and writer
-            reader = new SocketReaderThread(socket,this);
-            writer = new SocketWriterThread(socket);
+        socket = new Socket(address,port);
+        //Make reader and writer
+        reader = new SocketReaderThread(socket,this);
+        writer = new SocketWriterThread(socket);
 
-        } catch (SocketException e) {
-            Log.e(TAG,"Failed while making a new socket",e);
-        }
         reader.start();
         writer.start();
         Log.d(TAG,"Networking module running on port "+port);
@@ -82,10 +78,10 @@ public class JsonTcpClient {
         Log.d(TAG,"Sending: "+json.toString());
         writer.send(json);
     }
-    
+
     public void addListener(NetworkListener listener){
-    	listeners.add(listener);
-    	
+        listeners.add(listener);
+
     }
 
     /**
@@ -95,14 +91,14 @@ public class JsonTcpClient {
     void receiveData(JSONObject json) {
         Log.d(TAG,"Got packet! "+json.toString());
         try{
-        	if(json.getString("type") == "pos"){
-        		for(NetworkListener listener : listeners) {
-        			listener.packageReceived(json);
-        		}
-        	}
+            if(json.getString("type") == "pos"){
+                for(NetworkListener listener : listeners) {
+                    listener.packageReceived(json);
+                }
+            }
         }catch(JSONException err){
-        	Log.d(TAG, "Error regarding type field in packet");
-        	
+            Log.d(TAG, "Error regarding type field in packet");
+
         }
     }
 
