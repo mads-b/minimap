@@ -1,6 +1,8 @@
 package com.eit.minimap.network;
 
 import android.util.Log;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -9,7 +11,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Main class for client networking. Sends and receives Json objects through string serializations over TCP.
@@ -22,6 +26,7 @@ public class JsonTcpClient {
     private Socket socket;
     private SocketReaderThread reader;
     private SocketWriterThread writer;
+    private List<NetworkListener> listeners = new ArrayList<NetworkListener>();
 
 
     private static final String TAG = "com.eit.minimap.network.AbstractCommunicator";
@@ -30,7 +35,7 @@ public class JsonTcpClient {
      * Constructor for the networker.
      * @param portNum Port to initialize the networker on. 0 is "don't care".
      */
-    JsonTcpClient(InetAddress address,int portNum) {
+    public JsonTcpClient(InetAddress address,int portNum) {
         this.address=address;
         this.port=portNum;
     }
@@ -73,9 +78,14 @@ public class JsonTcpClient {
      * Adds a JSON object to the send queue and sends as soon as possible.
      * @param json Json object to send
      */
-    void sendData(JSONObject json) {
+    public void sendData(JSONObject json) {
         Log.d(TAG,"Sending: "+json.toString());
         writer.send(json);
+    }
+    
+    public void addListener(NetworkListener listener){
+    	listeners.add(listener);
+    	
     }
 
     /**
@@ -84,6 +94,16 @@ public class JsonTcpClient {
      */
     void receiveData(JSONObject json) {
         Log.d(TAG,"Got packet! "+json.toString());
+        try{
+        	if(json.getString("type") == "pos"){
+        		for(NetworkListener listener : listeners) {
+        			listener.packageReceived(json);
+        		}
+        	}
+        }catch(JSONException err){
+        	Log.d(TAG, "Error regarding type field in packet");
+        	
+        }
     }
 
     public int getPort() {
