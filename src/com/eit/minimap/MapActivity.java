@@ -5,15 +5,23 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import com.eit.minimap.network.JsonTcpClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -22,6 +30,8 @@ import java.net.UnknownHostException;
 public class MapActivity extends Activity {
     private GoogleMap map;
 
+    private final static String TAG = "com.eit.minimap.MapActivity";
+
     /**
      * Called when the activity is first created.
      */
@@ -29,8 +39,19 @@ public class MapActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
-        MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        final MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         map = mapFrag.getMap();
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+        // Start of fetching ANY location. Only for centering the map on a logical area.
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        final Criteria crit = new Criteria();
+        crit.setAccuracy(Criteria.NO_REQUIREMENT);
+        final String provider = lm.getBestProvider(crit, true);
+        final Location loc = lm.getLastKnownLocation(provider);
+        Log.d(TAG,"AnyLocation: "+loc.getLatitude()+" x "+loc.getLongitude()+"Vis?: "+mapFrag.isVisible());
+        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(),loc.getLongitude())));
+        map.animateCamera(CameraUpdateFactory.zoomBy(15f),5000,null);
     }
+
 }
