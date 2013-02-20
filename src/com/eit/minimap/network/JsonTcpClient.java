@@ -33,9 +33,10 @@ public class JsonTcpClient {
 
     /**
      * Constructor for the networker.
+     * Package-private to ensure it's being instantiated by the ClientConnectThread.
      * @param portNum Port to initialize the networker on. 0 is "don't care".
      */
-    public JsonTcpClient(InetAddress address,int portNum) {
+    JsonTcpClient(InetAddress address,int portNum) {
         this.address=address;
         this.port=portNum;
     }

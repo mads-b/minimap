@@ -71,6 +71,7 @@ class ClientConnectThread extends AsyncTask<Void,Void,String> implements DialogI
         if(dialog.isShowing())
             dialog.dismiss();
         if(error!=null) {
+            client.stop();
             Dialog d = new AlertDialog.Builder(context)
                     .setMessage(error)
                     .setPositiveButton(R.string.retry_button, this)
