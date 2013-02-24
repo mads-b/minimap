@@ -2,13 +2,13 @@ package com.eit.minimap.gps;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
 import com.eit.minimap.R;
+import com.eit.minimap.datastructures.UserStore;
 
 /**
  * Main class for getting GPS coordinates of device position.
@@ -16,14 +16,15 @@ import com.eit.minimap.R;
  */
 public class LocationProcessor implements LocationListener {
     private boolean displayedLocationProviderSelectionScreen = false;
-    final GpsStatus status = null;
     private final LocationManager locationManager;
     private String provider;
     private final GpsStatusListener gpsStatusListener;
     private final Context context;
+    private final UserStore listener;
 
-    public LocationProcessor(Context c) {
+    public LocationProcessor(Context c,UserStore listener) {
         this.context = c;
+        this.listener = listener;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         gpsStatusListener = new GpsStatusListener(context,locationManager);
     }
@@ -94,7 +95,7 @@ public class LocationProcessor implements LocationListener {
      * @param location Newest GPS position.
      */
     public void onLocationChanged(Location location) {
-        //TODO: Listener pattern: Send new GPS result to our listener
+        listener.locationChanged(location);
     }
 
 

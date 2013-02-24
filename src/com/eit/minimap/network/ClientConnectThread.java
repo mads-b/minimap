@@ -18,20 +18,20 @@ import java.net.UnknownHostException;
 /**
  * AsyncTask showing a progressdialog as it tries to connect to the host,
  * showing an error dialog on failure, with retry button and a return button transferring the user to the
- * MainActivity. On completion, the TcpClientRecipient is given a readily configured JsonTcpClient.
+ * MainActivity. On completion, the NetworkListener is given a readily configured JsonTcpClient.
  * This should be the only way a connection is established. If the connection is broken,
  * one should instantiate and run this thread again to reconnect.
  */
-class ClientConnectThread extends AsyncTask<Void,Void,String> implements DialogInterface.OnClickListener {
+public class ClientConnectThread extends AsyncTask<Void,Void,String> implements DialogInterface.OnClickListener {
     private final Context context;
-    private final TcpClientRecipient recipient;
+    private final NetworkListener recipient;
     private final Resources res;
     private ProgressDialog dialog;
     private JsonTcpClient client;
 
     private final static int CONNECTION_CHECK_TIMEOUT_MS = 10000;
 
-    private ClientConnectThread(Context c, TcpClientRecipient recipient) {
+    public ClientConnectThread(Context c, NetworkListener recipient) {
         this.context = c;
         this.recipient = recipient;
         this.res=c.getResources();
