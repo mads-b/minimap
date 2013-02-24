@@ -31,7 +31,16 @@ public class UserStore implements NetworkListener{
 		@Override
 		public void packageReceived(JSONObject pack) {
 			// TODO Auto-generated method stub
-			//U
+			try{
+				String mcAdr = pack.get("macAddr");
+				if(users.containsKey(mcAdr)){
+					User usr = users.get(mcAdr);
+					//usr.setAltitude(alt)
+				}
+			}catch(JSONException error){
+				
+			}
+			
 		}
 		
 }

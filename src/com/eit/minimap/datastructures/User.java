@@ -20,5 +20,11 @@ public class User {
 		public String getMacAddr(){
 			return macAddr;
 		}
+		public void setLongditude(double lon){
+			this.lon = lon;
+		}
+		public void setAltitude(double alt){
+			this.alt = alt;
+		}
 		
 }
