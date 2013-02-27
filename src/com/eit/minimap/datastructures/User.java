@@ -1,5 +1,7 @@
 package com.eit.minimap.datastructures;
 
+import com.google.android.gms.maps.model.Marker;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,6 +10,9 @@ public class User {
     //private Location pos;
     private String macAddr;
     private String screenName;
+
+    /** GoogleMap marker. */
+    private Marker marker;
     private List<Coordinate> positions = new ArrayList<Coordinate>();
 
 
@@ -31,5 +36,19 @@ public class User {
      */
     public List<Coordinate> getPositions() {
         return Collections.unmodifiableList(positions);
+    }
+
+    public Coordinate getPosition() {
+        if(positions.size()!=0)
+            return positions.get(positions.size()-1);
+        return null;
+    }
+
+    public Marker getMarker() {
+        return marker;
+    }
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
     }
 }

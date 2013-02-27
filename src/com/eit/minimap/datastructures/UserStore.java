@@ -71,18 +71,21 @@ public class UserStore implements NetworkListener {
                 //update Coordinate
                 Coordinate newCord = new Coordinate(pack);
                 usr.addPosition(newCord);
+                if(listener!=null) {
+                    listener.userPositionsChanged(this);
+                }
             }
             else if(type == "pInfo"){
                 User newUser = new User(mcAdr,pack.getString("screenName"));
                 addUser(newUser);
+                if(listener!=null) {
+                    listener.usersChanged(this);
+                }
             }else{
                 Log.e(TAG,"Received unknown packet or failed to receive packet");
             }
         }catch(JSONException error){
             Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
-        }
-        if(listener!=null) {
-            listener.storeChanged(this);
         }
     }
 
@@ -102,7 +105,7 @@ public class UserStore implements NetworkListener {
             Log.e(TAG,"Error constructing JSON packet");
         }
         if(listener!=null) {
-            listener.storeChanged(this);
+            listener.userPositionsChanged(this);
         }
     }
 
@@ -127,7 +130,8 @@ public class UserStore implements NetworkListener {
     }
 
     public interface UserStoreListener {
-        void storeChanged(UserStore store);
+        void userPositionsChanged(UserStore store);
+        void usersChanged(UserStore store);
     }
 }
 
