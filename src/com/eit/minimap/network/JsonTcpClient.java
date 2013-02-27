@@ -91,14 +91,10 @@ public class JsonTcpClient {
      */
     void receiveData(JSONObject json) {
         Log.d(TAG,"Got packet! "+json.toString());
-        //try{
-        	for(NetworkListener listener : listeners) {
-        		listener.packageReceived(json);
-            	}
-        /*}catch(JSONException err){
-            Log.d(TAG, "Error regarding type field in packet");
+        for(NetworkListener listener : listeners) {
+            listener.packageReceived(json);
+        }
 
-        }*/
     }
 
     public int getPort() {

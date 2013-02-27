@@ -17,97 +17,97 @@ import com.eit.minimap.network.JsonTcpClient;
 import com.eit.minimap.network.NetworkListener;
 
 public class UserStore implements NetworkListener {
-	/** Map containing all the users of this application. The key is the mac adress of the phone. */
-	private Map<String, User> users;
-	/** Network communicator. Not always set, so check if it's null when using it. */
-	private JsonTcpClient network;
-	/** Location resolver. Calls this store periodically to update current users' position */
-	private LocationProcessor processor;
-	private final static int MIN_POS_SEND_INTERVAL = 1000;
-	private final static String TAG = "com.eit.minimap.datastructures.UserStore";
-	/** Mac adress of the phone running this application. */
-	private String myMac;
-	
-	private long timeSinceLastSentPacket;
+    /** Map containing all the users of this application. The key is the mac adress of the phone. */
+    private Map<String, User> users;
+    /** Network communicator. Not always set, so check if it's null when using it. */
+    private JsonTcpClient network;
+    /** Location resolver. Calls this store periodically to update current users' position */
+    private LocationProcessor processor;
+    private final static int MIN_POS_SEND_INTERVAL = 1000;
+    private final static String TAG = "com.eit.minimap.datastructures.UserStore";
+    /** Mac adress of the phone running this application. */
+    private String myMac;
 
-	public UserStore(Context c){
-		users = new HashMap<String, User>();
+    private long timeSinceLastSentPacket;
 
-		// Get MAC address:
-		WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
-		String mac = wifiManager.getConnectionInfo().getMacAddress();
-		myMac = mac;
-		//Add our user!
-		users.put(myMac,new User(myMac,"TODO: Screenname here"));
-		
-		timeSinceLastSentPacket = 0;
+    public UserStore(Context c){
+        users = new HashMap<String, User>();
 
-	}
+        // Get MAC address:
+        WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
+        String mac = wifiManager.getConnectionInfo().getMacAddress();
+        myMac = mac;
+        //Add our user!
+        users.put(myMac,new User(myMac,"TODO: Screenname here"));
 
-	public void init(Context c) {
-		//Starts the connection process to host. Tcp client is received on completion.
-		new ClientConnectThread(c,this).execute();
-		processor.initializeProvider();
-		processor.startProvider();
-	}
+        timeSinceLastSentPacket = 0;
 
-	public void addUser(User usr){
-		users.put(usr.getMacAddr(),usr);
-	}
-	public void delUser(User usr){
-		users.remove(usr);
-	}
-	@Override
-	public void packageReceived(JSONObject pack) {
-		try{
-			String mcAdr = pack.getString("macAddr");
-			if(users.containsKey(mcAdr) && pack.getString("type") == "pos"){
-				User usr = users.get(mcAdr);
-				//update Coordinate
-				Coordinate newCord = new Coordinate(pack);
-				usr.addPosition(newCord);  
-			}
-			else if(pack.getString("type") == "pInfo"){
-				User newUser = new User(mcAdr,pack.getString("screenName"));
-				addUser(newUser);
-			}else{
-				Log.e(TAG,"Received unknown packet or failed to receive packet");
-			}
-		}catch(JSONException error){
-			Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
-		}
-	}
+    }
 
-	public void locationChanged(Location location){
-		// Re-wrap location
-		Coordinate coord = new Coordinate(
-				location.getLatitude(),
-				location.getLongitude(),
-				System.currentTimeMillis());
-		users.get(myMac).addPosition(coord);
-		// TODO: Send new position to server? Maybe not all the time?
-		// Construct JSON object
-		try{
-			if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
-				sendPosPacket(coord);
-				timeSinceLastSentPacket = System.currentTimeMillis();
-			}
-		}catch(JSONException error){
-			Log.e(TAG,"Error constructing JSON packet");
-		}
-	}
-	
-	public void sendPosPacket(Coordinate coord) throws JSONException{
-		JSONObject posPacket = coord.convertToJSON();
-		// call network.sendData(JSON json)
-		network.sendData(posPacket);
-	}
+    public void init(Context c) {
+        //Starts the connection process to host. Tcp client is received on completion.
+        new ClientConnectThread(c,this).execute();
+        processor.initializeProvider();
+        processor.startProvider();
+    }
 
-	@Override
-	public void receiveTcpClient(JsonTcpClient client) {
-		this.network = client;
-		network.addListener(this);
-	}
+    public void addUser(User usr){
+        users.put(usr.getMacAddr(),usr);
+    }
+    public void delUser(User usr){
+        users.remove(usr);
+    }
+    @Override
+    public void packageReceived(JSONObject pack) {
+        try{
+            String mcAdr = pack.getString("macAddr");
+            if(users.containsKey(mcAdr) && pack.getString("type") == "pos"){
+                User usr = users.get(mcAdr);
+                //update Coordinate
+                Coordinate newCord = new Coordinate(pack);
+                usr.addPosition(newCord);
+            }
+            else if(pack.getString("type") == "pInfo"){
+                User newUser = new User(mcAdr,pack.getString("screenName"));
+                addUser(newUser);
+            }else{
+                Log.e(TAG,"Received unknown packet or failed to receive packet");
+            }
+        }catch(JSONException error){
+            Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
+        }
+    }
+
+    public void locationChanged(Location location){
+        // Re-wrap location
+        Coordinate coord = new Coordinate(
+                location.getLatitude(),
+                location.getLongitude(),
+                System.currentTimeMillis());
+        users.get(myMac).addPosition(coord);
+        // TODO: Send new position to server? Maybe not all the time?
+        // Construct JSON object
+        try{
+            if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
+                sendPosPacket(coord);
+                timeSinceLastSentPacket = System.currentTimeMillis();
+            }
+        }catch(JSONException error){
+            Log.e(TAG,"Error constructing JSON packet");
+        }
+    }
+
+    public void sendPosPacket(Coordinate coord) throws JSONException{
+        JSONObject posPacket = coord.convertToJSON();
+        // call network.sendData(JSON json)
+        network.sendData(posPacket);
+    }
+
+    @Override
+    public void receiveTcpClient(JsonTcpClient client) {
+        this.network = client;
+        network.addListener(this);
+    }
 }
 
 
