@@ -1,5 +1,6 @@
 package com.eit.minimap.datastructures;
 
+import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,6 +11,8 @@ public class Coordinate {
     private final double latitude;
     private final double longitude;
     private final long timestamp;
+
+    private final static String TAG = "com.eit.minimap.datastructures.Coordinate";
 
     public Coordinate(double lat, double lon, long time) {
         this.latitude = lat;
@@ -34,20 +37,18 @@ public class Coordinate {
     public long getTimestamp() {
         return timestamp;
     }
-    public JSONObject convertToJSON(String mac){
-    	try{
-	    	JSONObject posPacket = new JSONObject();
-	        posPacket.put("type", "pos");
-	        posPacket.put("macAddr", mac);
-	        posPacket.put("lat", this.getLatitude());
-	        posPacket.put("lon", this.getLongitude());
-	        posPacket.put("time", this.getTimestamp());
-	        return posPacket;
-    	}catch(JSONException error){
-    		
-    		return null;
-    		
-    	}
-    	
+    public JSONObject convertToJSON(){
+        try{
+            JSONObject posPacket = new JSONObject();
+            posPacket.put("lat", this.getLatitude());
+            posPacket.put("lon", this.getLongitude());
+            posPacket.put("time", this.getTimestamp());
+            return posPacket;
+        }catch(JSONException error){
+            Log.e(TAG,"Error parsing JSON.",error);
+            return null;
+
+        }
+
     }
 }

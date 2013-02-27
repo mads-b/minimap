@@ -62,8 +62,8 @@ public class UserStore implements NetworkListener {
                 //update Coordinate
                 Coordinate newCord = new Coordinate(pack);
                 usr.addPosition(newCord);
-                
-                
+
+
             }else{
             	//Inkludere screenName i pack? Lar denne stå som someName foreløbig
             	User newUser = new User(mcAdr,"someName");
@@ -87,11 +87,13 @@ public class UserStore implements NetworkListener {
         try{
         	sendPosPacket(coord);
         }catch(JSONException error){
-        	
+
         }
     }
     public void sendPosPacket(Coordinate coord) throws JSONException{
-    	JSONObject posPacket = coord.convertToJSON(myMac);
+    	JSONObject posPacket = coord.convertToJSON();
+        posPacket.put("type","pos");
+        posPacket.put("macAddr",myMac);
         // call network.sendData(JSON json)
         network.sendData(posPacket);
     }
