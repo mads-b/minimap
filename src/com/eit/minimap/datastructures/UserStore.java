@@ -20,7 +20,7 @@ import com.eit.minimap.network.NetworkListener;
 
 public class UserStore implements NetworkListener {
     /** Map containing all the users of this application. The key is the mac adress of the phone. */
-    private Map<String, User> users;
+    private Map<String, User> users = new HashMap<String, User>();;
     /** Network communicator. Not always set, so check if it's null when using it. */
     private JsonTcpClient network;
     /** Location resolver. Calls this store periodically to update current users' position */
@@ -34,8 +34,6 @@ public class UserStore implements NetworkListener {
     private long timeSinceLastSentPacket;
 
     public UserStore(Context c){
-        users = new HashMap<String, User>();
-
         // Get MAC address:
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
         String mac = wifiManager.getConnectionInfo().getMacAddress();
@@ -64,13 +62,14 @@ public class UserStore implements NetworkListener {
     public void packageReceived(JSONObject pack) {
         try{
             String mcAdr = pack.getString("macAddr");
-            if(users.containsKey(mcAdr) && pack.getString("type") == "pos"){
+            String type = pack.getString("type");
+            if(users.containsKey(mcAdr) && type == "pos"){
                 User usr = users.get(mcAdr);
                 //update Coordinate
                 Coordinate newCord = new Coordinate(pack);
                 usr.addPosition(newCord);
             }
-            else if(pack.getString("type") == "pInfo"){
+            else if(type == "pInfo"){
                 User newUser = new User(mcAdr,pack.getString("screenName"));
                 addUser(newUser);
             }else{
@@ -91,8 +90,6 @@ public class UserStore implements NetworkListener {
                 location.getLongitude(),
                 System.currentTimeMillis());
         users.get(myMac).addPosition(coord);
-        // TODO: Send new position to server? Maybe not all the time?
-        // Construct JSON object
         try{
             if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
                 sendPosPacket(coord);
