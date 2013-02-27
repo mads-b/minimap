@@ -30,10 +30,12 @@ public class UserStore implements NetworkListener {
     private final static String TAG = "com.eit.minimap.datastructures.UserStore";
     /** Mac adress of the phone running this application. */
     private String myMac;
+    private Context context;
 
     private long timeSinceLastSentPacket;
 
     public UserStore(Context c){
+        this.context = c;
         // Get MAC address:
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
         String mac = wifiManager.getConnectionInfo().getMacAddress();
@@ -45,9 +47,10 @@ public class UserStore implements NetworkListener {
 
     }
 
-    public void init(Context c) {
+    public void init() {
         //Starts the connection process to host. Tcp client is received on completion.
-        new ClientConnectThread(c,this).execute();
+        new ClientConnectThread(context,this).execute();
+        processor = new LocationProcessor(context,this);
         processor.initializeProvider();
         processor.startProvider();
     }
