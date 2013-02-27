@@ -34,4 +34,20 @@ public class Coordinate {
     public long getTimestamp() {
         return timestamp;
     }
+    public JSONObject convertToJSON(String mac){
+    	try{
+	    	JSONObject posPacket = new JSONObject();
+	        posPacket.put("type", "pos");
+	        posPacket.put("macAddr", mac);
+	        posPacket.put("lat", this.getLatitude());
+	        posPacket.put("lon", this.getLongitude());
+	        posPacket.put("time", this.getTimestamp());
+	        return posPacket;
+    	}catch(JSONException error){
+    		
+    		return null;
+    		
+    	}
+    	
+    }
 }

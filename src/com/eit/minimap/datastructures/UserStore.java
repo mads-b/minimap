@@ -17,6 +17,7 @@ import com.eit.minimap.network.JsonTcpClient;
 import com.eit.minimap.network.NetworkListener;
 
 public class UserStore implements NetworkListener {
+	/** Map containing all the users of this application. The key is the mac adress of the phone. */
     private Map<String, User> users;
     /** Network communicator. Not always set, so check if it's null when using it. */
     private JsonTcpClient network;
@@ -24,6 +25,8 @@ public class UserStore implements NetworkListener {
     private LocationProcessor processor;
 
     private final static String TAG = "com.eit.minimap.datastructures.UserStore";
+    /** Mac adress of the phone running this application. */
+    private String myMac;
 
     public UserStore(Context c){
         users = new HashMap<String, User>();
@@ -31,9 +34,9 @@ public class UserStore implements NetworkListener {
         // Get MAC address:
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
         String mac = wifiManager.getConnectionInfo().getMacAddress();
-
+        myMac = mac;
         //Add our user!
-        users.put("thisUser",new User(mac,"TODO: Screenname here"));
+        users.put(myMac,new User(myMac,"TODO: Screenname here"));
 
     }
 
@@ -56,21 +59,41 @@ public class UserStore implements NetworkListener {
             String mcAdr = pack.getString("macAddr");
             if(users.containsKey(mcAdr)){
                 User usr = users.get(mcAdr);
-                //usr.setAltitude(alt)
+                //update Coordinate
+                Coordinate newCord = new Coordinate(pack);
+                usr.addPosition(newCord);
+                
+                
+            }else{
+            	//Inkludere screenName i pack? Lar denne stå som someName foreløbig
+            	User newUser = new User(mcAdr,"someName");
+            	addUser(newUser);
             }
         }catch(JSONException error){
             Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
         }
     }
 
-    public void locationChanged(Location location) {
+    public void locationChanged(Location location){
         // Re-wrap location
         Coordinate coord = new Coordinate(
                 location.getLatitude(),
                 location.getLongitude(),
                 System.currentTimeMillis());
-        users.get("thisUser").addPosition(coord);
+        users.get(myMac).addPosition(coord);
         // TODO: Send new position to server? Maybe not all the time?
+        // Can construct global variable timeSinceLastSent, and check that a significant amount of time has passed.
+        // Construct JSON object
+        try{
+        	sendPosPacket(coord);
+        }catch(JSONException error){
+        	
+        }
+    }
+    public void sendPosPacket(Coordinate coord) throws JSONException{
+    	JSONObject posPacket = coord.convertToJSON(myMac);
+        // call network.sendData(JSON json)
+        network.sendData(posPacket);
     }
 
     @Override
