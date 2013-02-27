@@ -25,6 +25,7 @@ public class UserStore implements NetworkListener {
     private JsonTcpClient network;
     /** Location resolver. Calls this store periodically to update current users' position */
     private LocationProcessor processor;
+    private UserStoreListener listener;
     private final static int MIN_POS_SEND_INTERVAL = 1000;
     private final static String TAG = "com.eit.minimap.datastructures.UserStore";
     /** Mac adress of the phone running this application. */
@@ -78,6 +79,9 @@ public class UserStore implements NetworkListener {
         }catch(JSONException error){
             Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
         }
+        if(listener!=null) {
+            listener.storeChanged(this);
+        }
     }
 
     public void locationChanged(Location location){
@@ -97,6 +101,9 @@ public class UserStore implements NetworkListener {
         }catch(JSONException error){
             Log.e(TAG,"Error constructing JSON packet");
         }
+        if(listener!=null) {
+            listener.storeChanged(this);
+        }
     }
 
     public void sendPosPacket(Coordinate coord) throws JSONException{
@@ -110,11 +117,18 @@ public class UserStore implements NetworkListener {
         this.network = client;
         network.addListener(this);
     }
-    
+
     public Collection<User> getUsers(){
         return Collections.unmodifiableCollection(users.values());
     }
-    
+
+    public void registerListener(UserStoreListener listener) {
+        this.listener=listener;
+    }
+
+    public interface UserStoreListener {
+        void storeChanged(UserStore store);
+    }
 }
 
 
