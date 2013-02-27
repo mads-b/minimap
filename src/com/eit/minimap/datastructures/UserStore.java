@@ -1,5 +1,7 @@
 package com.eit.minimap.datastructures;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,6 +110,12 @@ public class UserStore implements NetworkListener {
         this.network = client;
         network.addListener(this);
     }
+    
+    public Collection<User> getUsers(){
+        return Collections.unmodifiableCollection(users.values());
+    }
+    
 }
+
 
 
