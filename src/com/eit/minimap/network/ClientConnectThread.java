@@ -22,11 +22,10 @@ import java.net.UnknownHostException;
  * This should be the only way a connection is established. If the connection is broken,
  * one should instantiate and run this thread again to reconnect.
  */
-public class ClientConnectThread extends AsyncTask<Void,Void,String> implements DialogInterface.OnClickListener {
+public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     private final Context context;
     private final NetworkListener recipient;
     private final Resources res;
-    private ProgressDialog dialog;
     private JsonTcpClient client;
 
     private final static int CONNECTION_CHECK_TIMEOUT_MS = 10000;
@@ -39,10 +38,8 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> implements 
 
     @Override
     protected void onPreExecute() {
-        //Make & show process dialog while attempting to connect..
-        dialog = new ProgressDialog(context);
-        dialog.setMessage(context.getResources().getString(R.string.connecting_attempt));
-        dialog.show();
+        //Inform our listener of the fact that we are attempting our connection.
+        recipient.connectionChanged(NetworkListener.Change.CONNECTING);
     }
 
     @Override
@@ -68,29 +65,12 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> implements 
 
     @Override
     protected void onPostExecute(String error) {
-        if(dialog.isShowing())
-            dialog.dismiss();
         if(error!=null) {
+            recipient.connectionChanged(NetworkListener.Change.DISCONNECTED);
             client.stop();
-            Dialog d = new AlertDialog.Builder(context)
-                    .setMessage(error)
-                    .setPositiveButton(R.string.retry_button, this)
-                    .setNeutralButton(R.string.return_button, this).create();
-            d.show();
         } else { //No error to show.
+            recipient.connectionChanged(NetworkListener.Change.CONNECTED);
             recipient.receiveTcpClient(client);
-        }
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        if(which==Dialog.BUTTON_POSITIVE) {
-            //Make new thread and try again.
-            new ClientConnectThread(context,recipient).execute();
-        }
-        else if(which==Dialog.BUTTON_NEUTRAL) {
-            Intent i = new Intent(context,MainActivity.class);
-            context.startActivity(i);
         }
     }
 }

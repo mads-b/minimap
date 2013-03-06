@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import com.eit.minimap.datastructures.Coordinate;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
+import com.eit.minimap.network.NetworkListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -94,17 +95,17 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
 
     @Override
-    public void connectionChanged(Change c) {
+    public void connectionChanged(NetworkListener.Change c) {
         if(connectionProgress == null) return;
         switch (c) {
             case CONNECTING:
                 connectionProgress.setActionView(R.layout.actionbar_indeterminate_progress);
                 break;
             case CONNECTED:
-                connectionProgress.setActionView(null);
+                connectionProgress.setActionView(null); //TODO: Show green check mark instead
                 break;
             case DISCONNECTED:
-                connectionProgress.setActionView(null);
+                connectionProgress.setActionView(null); //TODO: Show red cross instead.
                 break;
         }
     }

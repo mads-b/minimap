@@ -82,7 +82,6 @@ public class JsonTcpClient {
 
     public void addListener(NetworkListener listener){
         listeners.add(listener);
-
     }
 
     /**
@@ -94,7 +93,15 @@ public class JsonTcpClient {
         for(NetworkListener listener : listeners) {
             listener.packageReceived(json);
         }
+    }
 
+    /**
+     * Callback method from the threads to inform this client of a failed connection.
+     */
+    void connectionFailed() {
+        for(NetworkListener listener : listeners) {
+            listener.connectionChanged(NetworkListener.Change.DISCONNECTED);
+        }
     }
 
     public int getPort() {

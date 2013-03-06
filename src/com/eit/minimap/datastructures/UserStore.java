@@ -10,6 +10,8 @@ import android.location.Location;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
+import com.eit.minimap.R;
 import com.eit.minimap.gps.LocationProcessor;
 import com.eit.minimap.network.ClientConnectThread;
 import org.json.JSONException;
@@ -92,8 +94,6 @@ public class UserStore implements NetworkListener {
 
     public void locationChanged(Location location){
         // Re-wrap location
-
-
         Coordinate coord = new Coordinate(
                 new LatLng(location.getLatitude(),location.getLongitude()),
                 System.currentTimeMillis());
@@ -123,6 +123,14 @@ public class UserStore implements NetworkListener {
         network.addListener(this);
     }
 
+    @Override
+    public void connectionChanged(Change c) {
+        listener.connectionChanged(c);
+        if(c == Change.DISCONNECTED) { //If disconnected, reconnect.
+            new ClientConnectThread(context,this).execute();
+        }
+    }
+
     public Collection<User> getUsers(){
         return Collections.unmodifiableCollection(users.values());
     }
@@ -135,8 +143,6 @@ public class UserStore implements NetworkListener {
         void userPositionsChanged(UserStore store);
         void usersChanged(UserStore store);
         void connectionChanged(Change c);
-
-        enum Change {CONNECTING,CONNECTED,DISCONNECTED};
     }
 }
 

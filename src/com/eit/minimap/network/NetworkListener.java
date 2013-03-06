@@ -20,4 +20,7 @@ public interface NetworkListener {
      */
     void receiveTcpClient(JsonTcpClient client);
 
+    void connectionChanged(Change c);
+    enum Change {CONNECTING,CONNECTED,DISCONNECTED};
+
 }
