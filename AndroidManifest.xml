@@ -32,6 +32,7 @@
       </intent-filter>
     </activity>
     <activity
-        android:name="com.eit.minimap.MapActivity" />
+        android:name="com.eit.minimap.MapActivity"
+        android:configChanges="orientation" />
   </application>
 </manifest>
