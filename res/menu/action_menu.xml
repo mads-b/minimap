@@ -10,7 +10,5 @@
         android:icon="@drawable/ic_launcher"
         android:showAsAction="always|withText"/>
   <item android:id="@+id/connection_progress"
-        android:title="@string/connecting_attempt"
-        android:icon="@drawable/ic_launcher"
       android:showAsAction="always|withText"/>
 </menu>

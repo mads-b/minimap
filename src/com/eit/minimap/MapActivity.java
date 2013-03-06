@@ -24,7 +24,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapActivity extends Activity implements UserStore.UserStoreListener {
     private GoogleMap map;
-    private MenuItem connectionProgress;
+    private MenuItem progressBar;
 
     private final static String TAG = "com.eit.minimap.MapActivity";
 
@@ -59,7 +59,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         final String provider = lm.getBestProvider(crit, true);
         final Location loc = lm.getLastKnownLocation(provider);
         if(loc != null) {
-            Log.d(TAG,"AnyLocation: "+loc.getLatitude()+" x "+loc.getLongitude()+"Vis?: "+mapFrag.isVisible());
+            Log.d(TAG,"AnyLocation: "+loc.getLatitude()+" x "+loc.getLongitude());
             map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(),loc.getLongitude())));
             map.animateCamera(CameraUpdateFactory.zoomBy(15f),5000,null);
         }
@@ -69,9 +69,8 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     public boolean onCreateOptionsMenu(Menu menu) {
         // Action bar inflation
         new MenuInflater(this).inflate(R.menu.action_menu,menu);
-        connectionProgress = menu.findItem(R.id.connection_progress);
-        connectionProgress.setActionView(R.layout.actionbar_indeterminate_progress);
-
+        progressBar = menu.findItem(R.id.connection_progress);
+        connectionChanged(NetworkListener.Change.DISCONNECTED);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -95,19 +94,26 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
 
     @Override
-    public void connectionChanged(NetworkListener.Change c) {
-        if(connectionProgress == null) return;
-        switch (c) {
-            case CONNECTING:
-                connectionProgress.setActionView(R.layout.actionbar_indeterminate_progress);
-                break;
-            case CONNECTED:
-                connectionProgress.setActionView(null); //TODO: Show green check mark instead
-                break;
-            case DISCONNECTED:
-                connectionProgress.setActionView(null); //TODO: Show red cross instead.
-                break;
-        }
+    public void connectionChanged(final NetworkListener.Change c) {
+        if(progressBar == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (c) {
+                    case CONNECTING:
+                        progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
+                        break;
+                    case CONNECTED:
+                        progressBar.setActionView(null);
+                        progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
+                        break;
+                    case DISCONNECTED:
+                        progressBar.setActionView(null);
+                        progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
+                        break;
+                }
+            }
+        });
     }
 
     public PolylineOptions userDrawLine(User user, int clr){

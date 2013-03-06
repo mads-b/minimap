@@ -23,23 +23,19 @@ import java.net.UnknownHostException;
  * one should instantiate and run this thread again to reconnect.
  */
 public class ClientConnectThread extends AsyncTask<Void,Void,String> {
-    private final Context context;
-    private final NetworkListener recipient;
+    private final TcpClientRecipient recipient;
     private final Resources res;
     private JsonTcpClient client;
 
     private final static int CONNECTION_CHECK_TIMEOUT_MS = 10000;
 
-    public ClientConnectThread(Context c, NetworkListener recipient) {
-        this.context = c;
+    public ClientConnectThread(Context c, TcpClientRecipient recipient) {
         this.recipient = recipient;
         this.res=c.getResources();
     }
 
     @Override
     protected void onPreExecute() {
-        //Inform our listener of the fact that we are attempting our connection.
-        recipient.connectionChanged(NetworkListener.Change.CONNECTING);
     }
 
     @Override
@@ -66,11 +62,18 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     @Override
     protected void onPostExecute(String error) {
         if(error!=null) {
-            recipient.connectionChanged(NetworkListener.Change.DISCONNECTED);
+            recipient.receiveTcpClient(null);
             client.stop();
         } else { //No error to show.
-            recipient.connectionChanged(NetworkListener.Change.CONNECTED);
             recipient.receiveTcpClient(client);
         }
+    }
+
+    public interface TcpClientRecipient {
+        /**
+         * Called by ClientConnectThread when a Tcp Client is set up correctly.
+         * @param client A JsonTcpClient, or null on failure.
+         */
+        void receiveTcpClient(JsonTcpClient client);
     }
 }

@@ -13,14 +13,7 @@ public interface NetworkListener {
      */
     void packageReceived(JSONObject pack);
 
-    /**
-     * Called by the ClientConnectThread to inform the listener when
-     * the client is finished connecting and ready for use.
-     * @param client The ready client object.
-     */
-    void receiveTcpClient(JsonTcpClient client);
-
     void connectionChanged(Change c);
-    enum Change {CONNECTING,CONNECTED,DISCONNECTED};
 
+    enum Change {CONNECTING,CONNECTED,DISCONNECTED};
 }
