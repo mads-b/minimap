@@ -21,7 +21,7 @@ import com.eit.minimap.network.JsonTcpClient;
 import com.eit.minimap.network.NetworkListener;
 import com.google.android.gms.maps.model.LatLng;
 
-public class UserStore implements NetworkListener {
+public class UserStore implements ClientConnectThread.TcpClientRecipient,NetworkListener {
     /** Map containing all the users of this application. The key is the mac adress of the phone. */
     private Map<String, User> users = new HashMap<String, User>();;
     /** Network communicator. Not always set, so check if it's null when using it. */
@@ -52,7 +52,7 @@ public class UserStore implements NetworkListener {
 
     public void init() {
         //Starts the connection process to host. Tcp client is received on completion.
-        new ClientConnectThread(context,this).execute();
+        connect();
         processor = new LocationProcessor(context,this);
         processor.initializeProvider();
         processor.startProvider();
@@ -63,7 +63,7 @@ public class UserStore implements NetworkListener {
     }
     public void delUser(User usr){
         users.remove(usr.getMacAddr());
-        
+
     }
     @Override
     public void packageReceived(JSONObject pack) {
@@ -123,6 +123,10 @@ public class UserStore implements NetworkListener {
 
     @Override
     public void receiveTcpClient(JsonTcpClient client) {
+        if(client == null) { //Connection failure. Reconnect
+            connect();
+            return;
+        }
         this.network = client;
         network.addListener(this);
     }
@@ -131,8 +135,13 @@ public class UserStore implements NetworkListener {
     public void connectionChanged(Change c) {
         listener.connectionChanged(c);
         if(c == Change.DISCONNECTED) { //If disconnected, reconnect.
-            new ClientConnectThread(context,this).execute();
+            connect();
         }
+    }
+
+    private void connect() {
+        listener.connectionChanged(Change.CONNECTING);
+        new ClientConnectThread(context,this).execute();
     }
 
     public Collection<User> getUsers(){
