@@ -85,6 +85,9 @@ public class UserStore implements NetworkListener {
                 if(listener!=null) {
                     listener.usersChanged(this);
                 }
+            }else if(type == "disc"){
+                User discUser = users.get(mcAdr);
+                delUser(discUser);
             }else{
                 Log.e(TAG,"Received unknown packet or failed to receive packet");
             }
