@@ -85,7 +85,7 @@ public class UserStore implements NetworkListener {
                 if(listener!=null) {
                     listener.usersChanged(this);
                 }
-            }else if(type == "disc"){
+            }else if(users.containsKey(mcAdr) && type == "disc"){
                 User discUser = users.get(mcAdr);
                 delUser(discUser);
             }else{
