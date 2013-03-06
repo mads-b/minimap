@@ -92,8 +92,8 @@ public class UserStore implements NetworkListener {
 
     public void locationChanged(Location location){
         // Re-wrap location
-        
-        
+
+
         Coordinate coord = new Coordinate(
                 new LatLng(location.getLatitude(),location.getLongitude()),
                 System.currentTimeMillis());
@@ -134,6 +134,9 @@ public class UserStore implements NetworkListener {
     public interface UserStoreListener {
         void userPositionsChanged(UserStore store);
         void usersChanged(UserStore store);
+        void connectionChanged(Change c);
+
+        enum Change {CONNECTING,CONNECTED,DISCONNECTED};
     }
 }
 
