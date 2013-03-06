@@ -2,6 +2,7 @@ package com.eit.minimap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +61,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         for(User user : store.getUsers()) {
             if(user.getPosition()==null) continue;
             Coordinate coord = user.getPosition();
-            LatLng latLng = new LatLng(coord.getLatitude(),coord.getLongitude());
+            LatLng latLng = coord.getLatLng();
 
             // Has a position, but no marker..
             if(user.getMarker()==null) {
@@ -72,5 +74,16 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
 
     @Override
     public void usersChanged(UserStore store) {
+    }
+    public PolylineOptions userDrawLine(User user, int clr){
+        PolylineOptions tail = new PolylineOptions();
+        tail.color(clr);
+        for(Coordinate coord : user.getPositions()){
+            LatLng latLng = coord.getLatLng();
+            tail.add(latLng);
+            
+        }
+        map.addPolyline(tail);
+        return tail;
     }
 }

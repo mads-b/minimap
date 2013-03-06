@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import com.eit.minimap.network.JsonTcpClient;
 import com.eit.minimap.network.NetworkListener;
+import com.google.android.gms.maps.model.LatLng;
 
 public class UserStore implements NetworkListener {
     /** Map containing all the users of this application. The key is the mac adress of the phone. */
@@ -91,9 +92,10 @@ public class UserStore implements NetworkListener {
 
     public void locationChanged(Location location){
         // Re-wrap location
+        
+        
         Coordinate coord = new Coordinate(
-                location.getLatitude(),
-                location.getLongitude(),
+                new LatLng(location.getLatitude(),location.getLongitude()),
                 System.currentTimeMillis());
         users.get(myMac).addPosition(coord);
         try{
