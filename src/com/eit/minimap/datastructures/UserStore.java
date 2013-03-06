@@ -62,7 +62,8 @@ public class UserStore implements NetworkListener {
         users.put(usr.getMacAddr(),usr);
     }
     public void delUser(User usr){
-        users.remove(usr);
+        users.remove(usr.getMacAddr());
+        
     }
     @Override
     public void packageReceived(JSONObject pack) {
