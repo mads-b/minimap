@@ -2,29 +2,25 @@ package com.eit.minimap.gps;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.widget.Toast;
 import com.eit.minimap.R;
-import com.eit.minimap.datastructures.UserStore;
 
 /**
  * Main class for getting GPS coordinates of device position.
  * To use: Instantiate -> initializeProvider() -> startProvider().
  */
-public class LocationProcessor implements LocationListener {
+public class LocationProcessor {
     private boolean displayedLocationProviderSelectionScreen = false;
     private final LocationManager locationManager;
     private String provider;
     private final GpsStatusListener gpsStatusListener;
     private final Context context;
-    private final UserStore listener;
+    private LocationListener listener;
 
-    public LocationProcessor(Context c,UserStore listener) {
+    public LocationProcessor(Context c) {
         this.context = c;
-        this.listener = listener;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         gpsStatusListener = new GpsStatusListener(context,locationManager);
     }
@@ -65,21 +61,23 @@ public class LocationProcessor implements LocationListener {
 
     /**
      * Starts the GPS. This processor will start receiving location updates shortly.
+     * @param listener Listener that will receive GPS status updates.
      */
-    public void startProvider() {
+    public void startProvider(LocationListener listener) {
+        this.listener = listener;
         // Requesting updates
         float minDistance = 0;
         //Update every second.
         long minTime = 1;
-        locationManager.requestLocationUpdates(provider, minTime, minDistance,this);
+        locationManager.requestLocationUpdates(provider, minTime, minDistance, listener);
     }
 
     /**
      * Stops the GPS.
      */
-    public void stopProvider() {
+    void stopProvider() {
         try{
-            locationManager.removeUpdates(this);
+            locationManager.removeUpdates(listener);
             locationManager.removeGpsStatusListener(gpsStatusListener);
         }
         catch(IllegalArgumentException ignored) {} //Called if we call stop twice. No matter.
@@ -88,25 +86,5 @@ public class LocationProcessor implements LocationListener {
     public void onDestroy() {
         stopProvider();
     }
-
-    /**
-     * Callback method from the GPS manager.
-     * Will be called once every time we have an updated position.
-     * @param location Newest GPS position.
-     */
-    public void onLocationChanged(Location location) {
-        listener.locationChanged(location);
-    }
-
-
-    public void onProviderDisabled(String arg0) {}
-
-
-    public void onProviderEnabled(String arg0) {}
-
-    public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-
-
-
 }
 

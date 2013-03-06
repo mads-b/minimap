@@ -21,8 +21,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import org.json.JSONObject;
 
-public class MapActivity extends Activity implements UserStore.UserStoreListener {
+public class MapActivity extends Activity implements UserStore.UserStoreListener,NetworkListener {
     private GoogleMap map;
     private MenuItem progressBar;
 
@@ -34,11 +35,6 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // The following three lines activates the GPS and connects to server.
-        //UserStore users = new UserStore(this);
-        //users.registerListener(this);
-        //users.init();
-
         setContentView(R.layout.map);
 
         //Customize ActionBar
@@ -63,6 +59,20 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
             map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(),loc.getLongitude())));
             map.animateCamera(CameraUpdateFactory.zoomBy(15f),5000,null);
         }
+
+        /*
+         * Init hardwaremanager, but do NOT start it, as starting it will make listener events fly.
+         * We want to attach our listeners before starting..
+         */
+        HardwareManager manager = new HardwareManager(this);
+        // Let this activity receive network updates (for some HUD).
+        manager.subscribeToNetworkUpdates(this);
+
+        UserStore userStore = new UserStore(manager);
+        // Listen for changes in user data.
+        userStore.registerListener(this);
+        // Make HardwareManager start sending messages..
+        manager.init();
     }
 
     @Override
@@ -70,7 +80,8 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         // Action bar inflation
         new MenuInflater(this).inflate(R.menu.action_menu,menu);
         progressBar = menu.findItem(R.id.connection_progress);
-        connectionChanged(NetworkListener.Change.DISCONNECTED);
+        //TODO: Delete
+        onConnectionChanged(NetworkListener.Change.DISCONNECTED);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -89,12 +100,19 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         }
     }
 
-    @Override
-    public void usersChanged(UserStore store) {
+    public PolylineOptions userDrawLine(User user, int clr){
+        PolylineOptions tail = new PolylineOptions();
+        tail.color(clr);
+        for(Coordinate coord : user.getPositions()){
+            LatLng latLng = coord.getLatLng();
+            tail.add(latLng);
+        }
+        map.addPolyline(tail);
+        return tail;
     }
 
     @Override
-    public void connectionChanged(final NetworkListener.Change c) {
+    public void onConnectionChanged(final Change c) {
         if(progressBar == null) return;
         runOnUiThread(new Runnable() {
             @Override
@@ -116,14 +134,12 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         });
     }
 
-    public PolylineOptions userDrawLine(User user, int clr){
-        PolylineOptions tail = new PolylineOptions();
-        tail.color(clr);
-        for(Coordinate coord : user.getPositions()){
-            LatLng latLng = coord.getLatLng();
-            tail.add(latLng);
-        }
-        map.addPolyline(tail);
-        return tail;
-    }
+    /*
+     * Unused methods below. Might be used in the future.
+     */
+    @Override
+    public void usersChanged(UserStore store) {}
+
+    @Override
+    public void onPackageReceived(JSONObject pack) {}
 }

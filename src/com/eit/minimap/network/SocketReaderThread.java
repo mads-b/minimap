@@ -39,6 +39,9 @@ class SocketReaderThread extends Thread {
             } catch (IOException e) {
                 if(running) {
                     Log.e(TAG,"Error occured while receiving packages",e);
+                    // Fatal error. Give up. Socket probably closed.
+                    receiver.sendConnectionStateChanged(NetworkListener.Change.FAILED);
+                    receiver.stop();
                 }
             } catch (JSONException e) {
                 Log.e(TAG,"Got mangled JSON from host! Data: "+data,e);

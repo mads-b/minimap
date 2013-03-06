@@ -11,9 +11,9 @@ public interface NetworkListener {
      * Called by a TcpClient to notify the listener of a received Json object.
      * @param pack Received Json object
      */
-    void packageReceived(JSONObject pack);
+    void onPackageReceived(JSONObject pack);
 
-    void connectionChanged(Change c);
+    void onConnectionChanged(Change c);
 
-    enum Change {CONNECTING,CONNECTED,DISCONNECTED};
+    enum Change {CONNECTING,CONNECTED,FAILED,DISCONNECTED}
 }

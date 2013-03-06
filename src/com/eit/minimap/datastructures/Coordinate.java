@@ -1,17 +1,14 @@
 package com.eit.minimap.datastructures;
 
 import android.util.Log;
+import com.google.android.gms.maps.model.LatLng;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Simple data object containing a GPS coordinate and the time this coordinate was set.
  */
 public class Coordinate {
-    //private final double latitude;
-    //private final double longitude;
     private final long timestamp;
     private final LatLng latLng;
     private final static String TAG = "com.eit.minimap.datastructures.Coordinate";
@@ -30,19 +27,11 @@ public class Coordinate {
         this.timestamp = obj.getLong("time");
     }
 
-    /*public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }*/
-    
     public LatLng getLatLng(){
         return latLng;
     }
 
-    public long getTimestamp() {
+    long getTimestamp() {
         return timestamp;
     }
     public JSONObject convertToJSON(){

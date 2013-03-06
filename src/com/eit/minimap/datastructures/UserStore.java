@@ -1,48 +1,43 @@
 package com.eit.minimap.datastructures;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.os.Bundle;
+import android.util.Log;
+import com.eit.minimap.HardwareManager;
+import com.eit.minimap.network.NetworkListener;
+import com.google.android.gms.maps.model.LatLng;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Context;
-import android.location.Location;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.util.Log;
-import android.widget.Toast;
-import com.eit.minimap.R;
-import com.eit.minimap.gps.LocationProcessor;
-import com.eit.minimap.network.ClientConnectThread;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.eit.minimap.network.JsonTcpClient;
-import com.eit.minimap.network.NetworkListener;
-import com.google.android.gms.maps.model.LatLng;
-
-public class UserStore implements ClientConnectThread.TcpClientRecipient,NetworkListener {
+public class UserStore implements NetworkListener,LocationListener {
     /** Map containing all the users of this application. The key is the mac adress of the phone. */
-    private Map<String, User> users = new HashMap<String, User>();;
-    /** Network communicator. Not always set, so check if it's null when using it. */
-    private JsonTcpClient network;
-    /** Location resolver. Calls this store periodically to update current users' position */
-    private LocationProcessor processor;
+    private final Map<String, User> users = new HashMap<String, User>();
+
+    // Listener to this store. When user states change, this gets called.
     private UserStoreListener listener;
     private final static int MIN_POS_SEND_INTERVAL = 1000;
     private final static String TAG = "com.eit.minimap.datastructures.UserStore";
     /** Mac adress of the phone running this application. */
-    private String myMac;
-    private Context context;
+    private final String myMac;
+
+    // Handler for Hardware interaction, like network, GPS etc..
+    private final HardwareManager hardwareManager;
 
     private long timeSinceLastSentPacket;
 
-    public UserStore(Context c){
-        this.context = c;
-        // Get MAC address:
-        WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
-        String mac = wifiManager.getConnectionInfo().getMacAddress();
-        myMac = mac;
+    public UserStore(HardwareManager manager){
+        this.hardwareManager = manager;
+        myMac = manager.getMacAddress();
+        // Subscribe to some data
+        manager.subscribeToNetworkUpdates(this);
+        manager.subscribeToLocationUpdates(this);
+
         //Add our user!
         users.put(myMac,new User(myMac,"TODO: Screenname here"));
 
@@ -50,27 +45,12 @@ public class UserStore implements ClientConnectThread.TcpClientRecipient,Network
 
     }
 
-    public void init() {
-        //Starts the connection process to host. Tcp client is received on completion.
-        connect();
-        processor = new LocationProcessor(context,this);
-        processor.initializeProvider();
-        processor.startProvider();
-    }
-
-    public void addUser(User usr){
-        users.put(usr.getMacAddr(),usr);
-    }
-    public void delUser(User usr){
-        users.remove(usr.getMacAddr());
-
-    }
     @Override
-    public void packageReceived(JSONObject pack) {
+    public void onPackageReceived(JSONObject pack) {
         try{
             String mcAdr = pack.getString("macAddr");
             String type = pack.getString("type");
-            if(users.containsKey(mcAdr) && type == "pos"){
+            if(users.containsKey(mcAdr) && type.equals("pos")){
                 User usr = users.get(mcAdr);
                 //update Coordinate
                 Coordinate newCord = new Coordinate(pack);
@@ -79,69 +59,41 @@ public class UserStore implements ClientConnectThread.TcpClientRecipient,Network
                     listener.userPositionsChanged(this);
                 }
             }
-            else if(type == "pInfo"){
+            else if(type.equals("pInfo")){
                 User newUser = new User(mcAdr,pack.getString("screenName"));
-                addUser(newUser);
+                users.put(newUser.getMacAddr(), newUser);
                 if(listener!=null) {
                     listener.usersChanged(this);
                 }
-            }else if(users.containsKey(mcAdr) && type == "disc"){
+            }else if(users.containsKey(mcAdr) && type.equals("disc")){
                 User discUser = users.get(mcAdr);
-                delUser(discUser);
+                users.remove(discUser.getMacAddr());
             }else{
-                Log.e(TAG,"Received unknown packet or failed to receive packet");
+                Log.e(TAG,"Received unknown packet or failed to receive packet. Contents: "+pack.toString());
             }
         }catch(JSONException error){
             Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
         }
     }
 
-    public void locationChanged(Location location){
+    @Override
+    public void onLocationChanged(Location location){
         // Re-wrap location
         Coordinate coord = new Coordinate(
                 new LatLng(location.getLatitude(),location.getLongitude()),
                 System.currentTimeMillis());
         users.get(myMac).addPosition(coord);
-        try{
-            if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
-                sendPosPacket(coord);
-                timeSinceLastSentPacket = System.currentTimeMillis();
-            }
-        }catch(JSONException error){
-            Log.e(TAG,"Error constructing JSON packet");
+
+        if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
+            JSONObject posPacket = coord.convertToJSON();
+            // Send new user position
+            hardwareManager.sendPackage(posPacket);
+            timeSinceLastSentPacket = System.currentTimeMillis();
         }
+
         if(listener!=null) {
             listener.userPositionsChanged(this);
         }
-    }
-
-    public void sendPosPacket(Coordinate coord) throws JSONException{
-        JSONObject posPacket = coord.convertToJSON();
-        // call network.sendData(JSON json)
-        network.sendData(posPacket);
-    }
-
-    @Override
-    public void receiveTcpClient(JsonTcpClient client) {
-        if(client == null) { //Connection failure. Reconnect
-            connect();
-            return;
-        }
-        this.network = client;
-        network.addListener(this);
-    }
-
-    @Override
-    public void connectionChanged(Change c) {
-        listener.connectionChanged(c);
-        if(c == Change.DISCONNECTED) { //If disconnected, reconnect.
-            connect();
-        }
-    }
-
-    private void connect() {
-        listener.connectionChanged(Change.CONNECTING);
-        new ClientConnectThread(context,this).execute();
     }
 
     public Collection<User> getUsers(){
@@ -155,9 +107,17 @@ public class UserStore implements ClientConnectThread.TcpClientRecipient,Network
     public interface UserStoreListener {
         void userPositionsChanged(UserStore store);
         void usersChanged(UserStore store);
-        void connectionChanged(Change c);
     }
+
+    /*
+     * Unused methods below. Use if necessary. (Transmitting GPS accuracy and the like.)
+     */
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {}
+    @Override
+    public void onProviderEnabled(String provider) {}
+    @Override
+    public void onProviderDisabled(String provider) {}
+    @Override
+    public void onConnectionChanged(Change c) {}
 }
-
-
-

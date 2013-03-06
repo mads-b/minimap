@@ -8,12 +8,12 @@ import java.util.List;
 
 public class User {
     //private Location pos;
-    private String macAddr;
-    private String screenName;
+    private final String macAddr;
+    private final String screenName;
 
     /** GoogleMap marker. */
     private Marker marker;
-    private List<Coordinate> positions = new ArrayList<Coordinate>();
+    private final List<Coordinate> positions = new ArrayList<Coordinate>();
 
 
     User(String macAddr, String screenName){

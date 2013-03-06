@@ -1,14 +1,8 @@
 package com.eit.minimap.network;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import com.eit.minimap.MainActivity;
 import com.eit.minimap.R;
 
 import java.io.IOException;
@@ -64,6 +58,7 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
         if(error!=null) {
             recipient.receiveTcpClient(null);
             client.stop();
+            //TODO: Error dialog containing above string. Force user to exit activity.
         } else { //No error to show.
             recipient.receiveTcpClient(client);
         }

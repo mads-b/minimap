@@ -2,20 +2,17 @@
 <resources>
   <string name="gps_disabled">GPS is disabled in settings. Please enable it.</string>
   <string name="first_gps_fix">Got a fix on your current GPS position!</string>
-  <string name="retry_button">Retry</string>
-  <string name="return_button">Return</string>
   <!--Main menu strings -->
   <string name="main_menu">Welcome to multiplayer maps!</string>
   <string name="group_name">Group Name:</string>
   <string name="your_name">Your name:</string>
   <string name="join_group">Join Group!</string>
   <string name="error_fields_empty">Error! You have not filled in all the fields!</string>
-  <string name="connecting_attempt">Trying to connect to unified server..</string>
   <string name="failed_io_err">Connection failed. IO error.</string>
   <string name="failed_no_host">Connection failed. Unknown host.</string>
   <string name="failed_not_reachable">Connection failed. Host not reachable.</string>
   <!--Settings menu strings -->
   <string name="user_settings">User settings</string>
   <string name="user_name">Your alias</string>
-  
+
 </resources>

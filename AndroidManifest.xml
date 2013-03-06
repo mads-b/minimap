@@ -3,7 +3,8 @@
           package="com.eit.minimap"
           android:versionCode="1"
           android:versionName="1.0">
-  <uses-sdk android:minSdkVersion="16"/>
+  <uses-sdk android:minSdkVersion="16"
+      android:targetSdkVersion="16"/>
   <uses-feature
       android:glEsVersion="0x00020000"
       android:required="true"/>

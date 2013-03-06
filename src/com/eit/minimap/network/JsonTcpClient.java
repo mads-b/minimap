@@ -1,18 +1,12 @@
 package com.eit.minimap.network;
 
 import android.util.Log;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,7 +20,7 @@ public class JsonTcpClient {
     private Socket socket;
     private SocketReaderThread reader;
     private SocketWriterThread writer;
-    private List<NetworkListener> listeners = new ArrayList<NetworkListener>();
+    private final List<NetworkListener> listeners = new ArrayList<NetworkListener>();
 
 
     private static final String TAG = "com.eit.minimap.network.AbstractCommunicator";
@@ -39,6 +33,7 @@ public class JsonTcpClient {
     JsonTcpClient(InetAddress address,int portNum) {
         this.address=address;
         this.port=portNum;
+        sendConnectionStateChanged(NetworkListener.Change.DISCONNECTED);
     }
 
     /**
@@ -46,6 +41,7 @@ public class JsonTcpClient {
      * @throws java.io.IOException If host cannot be reached
      */
     public void start() throws IOException {
+        sendConnectionStateChanged(NetworkListener.Change.CONNECTING);
         socket = new Socket(address,port);
         //Make reader and writer
         reader = new SocketReaderThread(socket,this);
@@ -54,6 +50,7 @@ public class JsonTcpClient {
         reader.start();
         writer.start();
         Log.d(TAG,"Networking module running on port "+port);
+        sendConnectionStateChanged(NetworkListener.Change.CONNECTED);
     }
 
     public void stop() {
@@ -68,6 +65,7 @@ public class JsonTcpClient {
                 Log.e(TAG,"Failed shutting down socket",e);
             }
         }
+        sendConnectionStateChanged(NetworkListener.Change.DISCONNECTED);
         Log.d(TAG,"Networking module stopped. Socket closed.");
     }
 
@@ -91,16 +89,13 @@ public class JsonTcpClient {
     void receiveData(JSONObject json) {
         Log.d(TAG,"Got packet! "+json.toString());
         for(NetworkListener listener : listeners) {
-            listener.packageReceived(json);
+            listener.onPackageReceived(json);
         }
     }
 
-    /**
-     * Callback method from the threads to inform this client of a failed connection.
-     */
-    void connectionFailed() {
+    void sendConnectionStateChanged(NetworkListener.Change c) {
         for(NetworkListener listener : listeners) {
-            listener.connectionChanged(NetworkListener.Change.DISCONNECTED);
+            listener.onConnectionChanged(c);
         }
     }
 
