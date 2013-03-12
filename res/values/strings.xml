@@ -17,8 +17,26 @@
   <!--Settings menu strings -->
   <string name="user_settings">User settings</string>
   <string name="user_name">Your alias</string>
-
+    <string name="Icon_prompt">Choose a icon</string>
+    <string-array name="Icon_array">
+        <item>Medic</item>
+        <item>Sniper</item>
+        <item>Idiot</item>
+        <item>Leader</item>
+        <item>Edvin</item>
+    </string-array>
+  <string name="server_head">Server</string>
+  <string name="view_head">View</string>
+  <string name="server_adr">Server adress</string>
+  <string name="view_users">View other users on map</string>
+  <string name="view_status">View other users status</string>
+  <string name="view_messges">Hide message box</string>
+  <string name="Button1">Cansel</string>
+  <string name="Button2">Save</string>
+  
   <!-- In-app messages -->
   <string name="user_connected">User with alias "%1$s" connected!</string>
   <string name="user_disconnected">User with alias "%1$s" has left.</string>
 </resources>
+
+

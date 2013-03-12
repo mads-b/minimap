@@ -1,20 +1,85 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/user_head"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_settings"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/user_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/user_name" />
+
+    <Spinner
+        android:id="@+id/spinner1"
+         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/Icon_array"
+        android:prompt="@string/Icon_prompt" />
+ 
+    <TextView
+        android:id="@+id/server_head"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/server_head"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/server_adr"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/server_adr" />
     
-  <TextView
-      android:id="@+id/user_head"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/user_settings"
-      android:textAppearance="?android:attr/textAppearanceLarge" />
-  
-  <EditText
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:hint="@string/user_name"
-      android:id="@+id/user_name"/>
+    <TextView
+        android:id="@+id/view_head"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_head"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_users" />
+    
+    <CheckBox
+        android:id="@+id/checkBox2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_status" />
+
+    <CheckBox
+        android:id="@+id/checkBox3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_messges" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom" >
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:text="@string/Button1" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:text="@string/Button2" />
+
+    </FrameLayout>
 
 </LinearLayout>
