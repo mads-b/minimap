@@ -3,6 +3,7 @@ package com.eit.minimap;
 import android.content.Context;
 import android.location.LocationListener;
 import android.net.wifi.WifiManager;
+import android.widget.Toast;
 import com.eit.minimap.gps.LocationProcessor;
 import com.eit.minimap.network.ClientConnectThread;
 import com.eit.minimap.network.JsonTcpClient;
@@ -16,10 +17,11 @@ import java.util.Set;
  * Main class for managing hardware resources, connections and data extraction.
  * Pass this instance around to classes needing hardware access of any kind.
  */
-public class HardwareManager implements ClientConnectThread.TcpClientRecipient,NetworkListener {
+public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
     private JsonTcpClient networkClient;
     private final LocationProcessor locationProcessor;
     private final Context context;
+    private NetworkState state = NetworkState.DISCONNECTED;
 
     // Cache to store all NetworkListeners before we have a working network.
     private final Set<NetworkListener> listenerCache = new HashSet<NetworkListener>();
@@ -32,6 +34,7 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient,N
     public void init() {
         // Init networking.
         new ClientConnectThread(context,this).execute();
+        state = NetworkState.CONNECTING;
 
         // Init GPS. Does not start polling for updates.
         locationProcessor.initializeProvider();
@@ -63,21 +66,25 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient,N
     }
 
     @Override
-    public void receiveTcpClient(JsonTcpClient client) {
+    public void receiveTcpClient(JsonTcpClient client, String error) {
+        if(client == null) {
+            //Connection failed. Try again.
+            Toast.makeText(context,error,Toast.LENGTH_SHORT).show();
+            new ClientConnectThread(context,this).execute();
+
+            return; //Failed. return.
+        }
+
         this.networkClient = client;
+        // Received a TCP client. Add all network listeners we know of from before.
         for(NetworkListener listener : listenerCache) {
             client.addListener(listener);
         }
-        client.addListener(this);
     }
 
-    @Override
-    public void onPackageReceived(JSONObject pack) {}
+    public NetworkState getState() { return state; }
 
-    @Override
-    public void onConnectionChanged(Change c) {
-        if(c == Change.FAILED) {
-            new ClientConnectThread(context,this).execute();
-        }
+    public enum NetworkState  {
+        DISCONNECTED,CONNECTED,CONNECTING;
     }
 }

@@ -7,12 +7,18 @@
   <string name="group_name">Group Name:</string>
   <string name="your_name">Your name:</string>
   <string name="join_group">Join Group!</string>
+
+  <!-- Error messages from networker -->
   <string name="error_fields_empty">Error! You have not filled in all the fields!</string>
   <string name="failed_io_err">Connection failed. IO error.</string>
   <string name="failed_no_host">Connection failed. Unknown host.</string>
   <string name="failed_not_reachable">Connection failed. Host not reachable.</string>
+
   <!--Settings menu strings -->
   <string name="user_settings">User settings</string>
   <string name="user_name">Your alias</string>
 
+  <!-- In-app messages -->
+  <string name="user_connected">User with alias "%1$s" connected!</string>
+  <string name="user_disconnected">User with alias "%1$s" has left.</string>
 </resources>

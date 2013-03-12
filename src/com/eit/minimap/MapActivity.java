@@ -11,21 +11,27 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 import com.eit.minimap.datastructures.Coordinate;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
-import com.eit.minimap.network.NetworkListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import org.json.JSONObject;
 
-public class MapActivity extends Activity implements UserStore.UserStoreListener,NetworkListener {
+public class MapActivity extends Activity implements UserStore.UserStoreListener, MenuItem.OnMenuItemClickListener {
+    private UserStore userStore;
     private GoogleMap map;
     private MenuItem progressBar;
+    private HardwareManager hardwareManager;
+
+    // Time scrubbing stuff.
+    private boolean timeScrubbingActivated = false;
+
+    // Remember the last state the network was in.
+    private HardwareManager.NetworkState lastState;
 
     private final static String TAG = "com.eit.minimap.MapActivity";
 
@@ -61,18 +67,17 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         }
 
         /*
-         * Init hardwaremanager, but do NOT start it, as starting it will make listener events fly.
-         * We want to attach our listeners before starting..
+         * Init hardwaremanager. This will cause it to make the connection to the server.
          */
-        HardwareManager manager = new HardwareManager(this);
-        // Let this activity receive network updates (for some HUD).
-        manager.subscribeToNetworkUpdates(this);
+        hardwareManager = new HardwareManager(this);
+        // Make HardwareManager start setting up positioning and networking.
+        hardwareManager.init();
 
-        UserStore userStore = new UserStore(manager);
+        userStore = new UserStore(hardwareManager);
         // Listen for changes in user data.
         userStore.registerListener(this);
-        // Make HardwareManager start sending messages..
-        manager.init();
+        // Sets up a thread to periodically check what state the network is in.
+        getNetworkStatePeriodically();
     }
 
     @Override
@@ -80,66 +85,86 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         // Action bar inflation
         new MenuInflater(this).inflate(R.menu.action_menu,menu);
         progressBar = menu.findItem(R.id.connection_progress);
-        //TODO: Delete
-        onConnectionChanged(NetworkListener.Change.DISCONNECTED);
+        // Listen for events when time scrubbing is selected.
+        menu.findItem(R.id.toggleScrubbing).setOnMenuItemClickListener(this);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public void userPositionsChanged(UserStore store) {
-        for(User user : store.getUsers()) {
-            if(user.getPosition()==null) continue;
-            Coordinate coord = user.getPosition();
+    public void userPositionChanged(UserStore store, User user) {
+        // Map doesn't care about users without positions.
+        if(user.getPosition()==null) return;
+        Coordinate coord = user.getPosition();
 
-            // Has a position, but no marker..
-            if(user.getMarker()==null) {
-                user.setMarker(map.addMarker(new MarkerOptions().position(coord.getLatLng())));
-            } else if(user.getMarker()!=null) {
-                user.getMarker().setPosition(coord.getLatLng());
-            }
+        // Has a position, but no marker..
+        if(user.getMarker()==null) {
+            user.setMarker(map.addMarker(new MarkerOptions().position(coord.getLatLng())));
         }
-    }
-
-    public PolylineOptions userDrawLine(User user, int clr){
-        PolylineOptions tail = new PolylineOptions();
-        tail.color(clr);
-        for(Coordinate coord : user.getPositions()){
-            LatLng latLng = coord.getLatLng();
-            tail.add(latLng);
+        // Has position and marker.
+        else if(user.getMarker()!=null) {
+            user.getMarker().setPosition(coord.getLatLng());
+            //Remake polyline if time scrubbing is activated.
+            if(timeScrubbingActivated)
+                user.makePolyline(this.map);
         }
-        map.addPolyline(tail);
-        return tail;
     }
 
     @Override
-    public void onConnectionChanged(final Change c) {
-        if(progressBar == null) return;
-        runOnUiThread(new Runnable() {
+    public void userChanged(UserStore store, User user) {
+        if(user.getPosition() == null) { // A user without a position is a new user!
+            String connectMsg = this.getString(R.string.user_connected, user.getScreenName());
+            Toast.makeText(this,connectMsg,Toast.LENGTH_LONG);
+        } else { // Second case: If he has a position, he is in the process of disconnecting.
+            String disconnectMsg = this.getString(R.string.user_disconnected, user.getScreenName());
+            Toast.makeText(this,disconnectMsg,Toast.LENGTH_LONG);
+        }
+    }
+
+    private void getNetworkStatePeriodically() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                switch (c) {
-                    case CONNECTING:
-                        progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
-                        break;
-                    case CONNECTED:
-                        progressBar.setActionView(null);
-                        progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
-                        break;
-                    case DISCONNECTED:
-                        progressBar.setActionView(null);
-                        progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
-                        break;
+                while(true) {
+                    HardwareManager.NetworkState newState = hardwareManager.getState();
+                    if(lastState == newState || progressBar == null) continue; // No need to update.
+                    lastState = newState;
+
+                    switch (hardwareManager.getState()) {
+                        case CONNECTING:
+                            progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
+                            break;
+                        case CONNECTED:
+                            progressBar.setActionView(null);
+                            progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
+                            break;
+                        case DISCONNECTED:
+                            progressBar.setActionView(null);
+                            progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
+                            break;
+                    }
+                    //Check network state every .5 seconds.
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ignored) {}
                 }
             }
-        });
+        }).start();
     }
 
-    /*
-     * Unused methods below. Might be used in the future.
-     */
     @Override
-    public void usersChanged(UserStore store) {}
-
-    @Override
-    public void onPackageReceived(JSONObject pack) {}
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.toggleScrubbing:
+                timeScrubbingActivated ^= true;
+                // Iterate over all users, making or adding "tail" depending on time scrubbing toggle.
+                for(User user : userStore.getUsers()) {
+                    if(timeScrubbingActivated)
+                        user.makePolyline(this.map);
+                    else
+                        user.removePolyline();
+                }
+                break;
+        }
+        return true;
+    }
 }

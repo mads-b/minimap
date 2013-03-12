@@ -40,7 +40,6 @@ class SocketReaderThread extends Thread {
                 if(running) {
                     Log.e(TAG,"Error occured while receiving packages",e);
                     // Fatal error. Give up. Socket probably closed.
-                    receiver.sendConnectionStateChanged(NetworkListener.Change.FAILED);
                     receiver.stop();
                 }
             } catch (JSONException e) {

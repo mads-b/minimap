@@ -33,7 +33,6 @@ public class JsonTcpClient {
     JsonTcpClient(InetAddress address,int portNum) {
         this.address=address;
         this.port=portNum;
-        sendConnectionStateChanged(NetworkListener.Change.DISCONNECTED);
     }
 
     /**
@@ -41,7 +40,6 @@ public class JsonTcpClient {
      * @throws java.io.IOException If host cannot be reached
      */
     public void start() throws IOException {
-        sendConnectionStateChanged(NetworkListener.Change.CONNECTING);
         socket = new Socket(address,port);
         //Make reader and writer
         reader = new SocketReaderThread(socket,this);
@@ -50,7 +48,6 @@ public class JsonTcpClient {
         reader.start();
         writer.start();
         Log.d(TAG,"Networking module running on port "+port);
-        sendConnectionStateChanged(NetworkListener.Change.CONNECTED);
     }
 
     public void stop() {
@@ -65,7 +62,6 @@ public class JsonTcpClient {
                 Log.e(TAG,"Failed shutting down socket",e);
             }
         }
-        sendConnectionStateChanged(NetworkListener.Change.DISCONNECTED);
         Log.d(TAG,"Networking module stopped. Socket closed.");
     }
 
@@ -90,12 +86,6 @@ public class JsonTcpClient {
         Log.d(TAG,"Got packet! "+json.toString());
         for(NetworkListener listener : listeners) {
             listener.onPackageReceived(json);
-        }
-    }
-
-    void sendConnectionStateChanged(NetworkListener.Change c) {
-        for(NetworkListener listener : listeners) {
-            listener.onConnectionChanged(c);
         }
     }
 

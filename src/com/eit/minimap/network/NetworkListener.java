@@ -12,8 +12,4 @@ public interface NetworkListener {
      * @param pack Received Json object
      */
     void onPackageReceived(JSONObject pack);
-
-    void onConnectionChanged(Change c);
-
-    enum Change {CONNECTING,CONNECTED,FAILED,DISCONNECTED}
 }

@@ -3,6 +3,8 @@ package com.eit.minimap.network;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 import com.eit.minimap.R;
 
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     private JsonTcpClient client;
 
     private final static int CONNECTION_CHECK_TIMEOUT_MS = 10000;
+    private final static String TAG = "com.eit.minimap.network.ClientConnectThread";
 
     public ClientConnectThread(Context c, TcpClientRecipient recipient) {
         this.recipient = recipient;
@@ -56,11 +59,12 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     @Override
     protected void onPostExecute(String error) {
         if(error!=null) {
-            recipient.receiveTcpClient(null);
-            client.stop();
+            Log.e(TAG,"Connection failed with error: "+error);
+            recipient.receiveTcpClient(null,error);
+            if(client!=null) client.stop();
             //TODO: Error dialog containing above string. Force user to exit activity.
         } else { //No error to show.
-            recipient.receiveTcpClient(client);
+            recipient.receiveTcpClient(client,null);
         }
     }
 
@@ -68,7 +72,8 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
         /**
          * Called by ClientConnectThread when a Tcp Client is set up correctly.
          * @param client A JsonTcpClient, or null on failure.
+         * @param err Error string detailing what went wrong.
          */
-        void receiveTcpClient(JsonTcpClient client);
+        void receiveTcpClient(JsonTcpClient client,String err);
     }
 }

@@ -50,24 +50,31 @@ public class UserStore implements NetworkListener,LocationListener {
         try{
             String mcAdr = pack.getString("macAddr");
             String type = pack.getString("type");
+            // Got a new user position
             if(users.containsKey(mcAdr) && type.equals("pos")){
                 User usr = users.get(mcAdr);
                 //update Coordinate
                 Coordinate newCord = new Coordinate(pack);
                 usr.addPosition(newCord);
                 if(listener!=null) {
-                    listener.userPositionsChanged(this);
+                    listener.userPositionChanged(this, usr);
                 }
             }
+            // Got user information
             else if(type.equals("pInfo")){
                 User newUser = new User(mcAdr,pack.getString("screenName"));
                 users.put(newUser.getMacAddr(), newUser);
                 if(listener!=null) {
-                    listener.usersChanged(this);
+                    listener.userChanged(this, newUser);
                 }
-            }else if(users.containsKey(mcAdr) && type.equals("disc")){
+            }
+            // Got disconnect message.
+            else if(users.containsKey(mcAdr) && type.equals("disc")){
                 User discUser = users.get(mcAdr);
                 users.remove(discUser.getMacAddr());
+                if(listener!=null) {
+                    listener.userChanged(this, discUser);
+                }
             }else{
                 Log.e(TAG,"Received unknown packet or failed to receive packet. Contents: "+pack.toString());
             }
@@ -92,7 +99,7 @@ public class UserStore implements NetworkListener,LocationListener {
         }
 
         if(listener!=null) {
-            listener.userPositionsChanged(this);
+            listener.userPositionChanged(this,users.get(myMac));
         }
     }
 
@@ -105,8 +112,19 @@ public class UserStore implements NetworkListener,LocationListener {
     }
 
     public interface UserStoreListener {
-        void userPositionsChanged(UserStore store);
-        void usersChanged(UserStore store);
+        /**
+         * Called when a user position is changed.
+         * @param store This store
+         * @param user The user whose position changed
+         */
+        void userPositionChanged(UserStore store, User user);
+
+        /**
+         * Called when a user is added or removed from the store, or otherwise changed.
+         * @param store This store
+         * @param user The user in question.
+         */
+        void userChanged(UserStore store, User user);
     }
 
     /*
@@ -118,6 +136,4 @@ public class UserStore implements NetworkListener,LocationListener {
     public void onProviderEnabled(String provider) {}
     @Override
     public void onProviderDisabled(String provider) {}
-    @Override
-    public void onConnectionChanged(Change c) {}
 }
