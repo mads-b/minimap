@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.eit.minimap.datastructures.Coordinate;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -92,26 +91,17 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
 
     @Override
     public void userPositionChanged(UserStore store, User user) {
-        // Map doesn't care about users without positions.
-        if(user.getPosition()==null) return;
-        Coordinate coord = user.getPosition();
-
-        // Has a position, but no marker..
-        if(user.getMarker()==null) {
-            user.setMarker(map.addMarker(new MarkerOptions().position(coord.getLatLng())));
-        }
-        // Has position and marker.
-        else if(user.getMarker()!=null) {
-            user.getMarker().setPosition(coord.getLatLng());
-            //Remake polyline if time scrubbing is activated.
-            if(timeScrubbingActivated)
-                user.makePolyline(this.map);
-        }
+        //Remake polyline if time scrubbing is activated.
+        if(timeScrubbingActivated)
+            user.makePolyline(this.map);
     }
 
     @Override
     public void userChanged(UserStore store, User user) {
         if(user.getPosition() == null) { // A user without a position is a new user!
+            //Make a marker for the user. No position, as one is not available. User fixes this himself.
+            user.setMarker(map.addMarker(new MarkerOptions()));
+
             String connectMsg = this.getString(R.string.user_connected, user.getScreenName());
             Toast.makeText(this,connectMsg,Toast.LENGTH_LONG);
         } else { // Second case: If he has a position, he is in the process of disconnecting.
