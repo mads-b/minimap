@@ -7,11 +7,14 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.eit.minimap.datastructures.MessageHandler;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,8 +23,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapActivity extends Activity implements UserStore.UserStoreListener, MenuItem.OnMenuItemClickListener {
+public class MapActivity extends Activity implements UserStore.UserStoreListener, MessageHandler.MessageHandlerListener, MenuItem.OnMenuItemClickListener {
     private UserStore userStore;
+    private MessageHandler messageHandler;
     private GoogleMap map;
     private MenuItem progressBar;
     private HardwareManager hardwareManager;
@@ -72,7 +76,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         // Make HardwareManager start setting up positioning and networking.
         hardwareManager.init();
 
-        userStore = new UserStore(hardwareManager);
+        userStore = new UserStore(hardwareManager, PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name"));
         // Listen for changes in user data.
         userStore.registerListener(this);
         // Sets up a thread to periodically check what state the network is in.
@@ -154,5 +158,10 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
             }
         }
         return true;
+    }
+    
+    public void messageReceived(MessageHandler msgHandler){
+        //Show message on screen?
+        
     }
 }

@@ -38,6 +38,7 @@ public class Coordinate {
         try{
             LatLng lngToSend = this.getLatLng();
             JSONObject posPacket = new JSONObject();
+            posPacket.put("type", "pos");
             posPacket.put("lat", lngToSend.latitude);
             posPacket.put("lon", lngToSend.longitude);
             posPacket.put("time", this.getTimestamp());
