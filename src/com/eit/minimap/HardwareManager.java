@@ -12,7 +12,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -29,7 +31,7 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
     private final Set<NetworkListener> listenerCache = new HashSet<NetworkListener>();
 
     // Cache to store messages if connection is down
-    private final List<JSONObject> packageCache = new ArrayList<JSONObject>();
+    private final Queue<JSONObject> packageCache = new LinkedList<JSONObject>();
 
     public HardwareManager(Context context) {
         this.context = context;
@@ -89,10 +91,9 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
             client.addListener(listener);
         }
         // Send cached packages.
-        for(JSONObject obj : packageCache) {
-            client.sendData(obj);
-        }
-        packageCache.clear();
+        while(!packageCache.isEmpty())
+            client.sendData(packageCache.remove());
+
         this.state = NetworkState.CONNECTED;
     }
 

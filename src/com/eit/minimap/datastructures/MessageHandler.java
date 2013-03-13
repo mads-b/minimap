@@ -45,8 +45,9 @@ public class MessageHandler implements NetworkListener {
     public void onPackageReceived(JSONObject pack) {
         try{
             String type = pack.getString("type");
-            // TODO: Doesn't check if message is meant for us. Let's hope server does this.
-            if(type.equals("msg")){
+            String dest = pack.getString("destAddr");
+            // Check if this is a message, and if it is meant for us!
+            if(type.equals("msg") && dest.equals(manager.getMacAddress())){
                 addMessage(new Message(pack));
                 if(listener!=null) {
                     listener.messageReceived(this);

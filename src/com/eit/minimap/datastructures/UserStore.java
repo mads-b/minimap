@@ -20,7 +20,11 @@ public class UserStore implements NetworkListener,LocationListener {
     private final Map<String, User> users = new HashMap<String, User>();
 
     // Listener to this store. When user states change, this gets called.
-    private UserStoreListener listener;
+    // The listener is set from the get-go to ensure it's never null.
+    private UserStoreListener listener = new UserStoreListener() {
+        public void userPositionChanged(User user) {}
+        public void userChanged(User user) {}};
+
     private final static int MIN_POS_SEND_INTERVAL = 1000;
     private final static String TAG = "com.eit.minimap.datastructures.UserStore";
     /** Mac adress of the phone running this application. */
@@ -58,26 +62,20 @@ public class UserStore implements NetworkListener,LocationListener {
                 //update Coordinate
                 Coordinate newCord = new Coordinate(pack);
                 usr.addPosition(newCord);
-                if(listener!=null) {
-                    listener.userPositionChanged(usr);
-                }
+                listener.userPositionChanged(usr);
             }
             // Got user information
             else if(type.equals("pInfo")){
                 User newUser = new User(pack);
                 users.put(newUser.getMacAddr(), newUser);
                 Log.d(TAG,"Added new user with name "+newUser.getScreenName()+" and MAC "+newUser.getMacAddr());
-                if(listener!=null) {
-                    listener.userChanged(newUser);
-                }
+                listener.userChanged(newUser);
             }
             // Got disconnect message.
             else if(users.containsKey(mcAdr) && type.equals("disc")){
                 User discUser = users.get(mcAdr);
                 users.remove(discUser.getMacAddr());
-                if(listener!=null) {
-                    listener.userChanged(discUser);
-                }
+                listener.userChanged(discUser);
             }else{
                 Log.e(TAG,"Received unknown packet or failed to receive packet. Contents: "+pack.toString());
             }
@@ -104,9 +102,7 @@ public class UserStore implements NetworkListener,LocationListener {
             timeSinceLastSentPacket = System.currentTimeMillis();
         }
 
-        if(listener!=null) {
-            listener.userPositionChanged(users.get(myUser.getMacAddr()));
-        }
+        listener.userPositionChanged(users.get(myUser.getMacAddr()));
     }
 
     public Collection<User> getUsers(){

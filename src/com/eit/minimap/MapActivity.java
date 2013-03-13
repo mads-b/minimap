@@ -108,22 +108,15 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     @Override
     public void userPositionChanged(final User user) {
         //Remake polyline if time scrubbing is activated.
+        final GoogleMap thismap = this.map;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 user.updateMarker();
+                if(!timeScrubbingActivated) return;
+                user.makePolyline(thismap);
             }
         });
-
-        if(timeScrubbingActivated) {
-            final GoogleMap thismap = this.map;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    user.makePolyline(thismap);
-                }
-            });
-        }
     }
 
     @Override
@@ -207,6 +200,5 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     @Override
     public void messageReceived(MessageHandler msgHandler){
         //Show message on screen?
-
     }
 }
