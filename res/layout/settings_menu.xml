@@ -17,7 +17,7 @@
         android:hint="@string/group_name" />
 
     <EditText
-        android:id="@+id/user_name"
+        android:id="@+id/your_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/your_name" />
@@ -60,12 +60,14 @@
     <CheckBox
         android:id="@+id/view_status"
         android:layout_width="fill_parent"
+        android:enabled="true"
         android:layout_height="wrap_content"
         android:text="@string/view_status" />
 
     <CheckBox
         android:id="@+id/view_messges"
         android:layout_width="fill_parent"
+        android:enabled="false"
         android:layout_height="wrap_content"
         android:text="@string/view_messges" />
 

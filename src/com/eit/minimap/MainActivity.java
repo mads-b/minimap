@@ -41,11 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
      */
     @Override
     public void onClick(View v) {
-    	if(v.getId() == R.id.settings_button){
-    		Intent SettingsIntent = new Intent(this, SettingsActivity.class);
-            startActivity(SettingsIntent);
-            return;
-    	}
+
         String groupNameStr = groupName.getText().toString();
         String yourNameStr = yourName.getText().toString();
         // Error if some fields are empty
@@ -58,7 +54,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 .putString("groupName",groupNameStr)
                 .putString("yourName",yourNameStr)
                 .commit();
-
+        // Starts settings menu
+    	if(v.getId() == R.id.settings_button){
+    		Intent SettingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(SettingsIntent);
+            return;
+    	}
         // Go to next activity!
         Intent myIntent = new Intent(this, MapActivity.class);
         startActivity(myIntent);
