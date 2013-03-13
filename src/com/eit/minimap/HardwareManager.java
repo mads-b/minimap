@@ -10,7 +10,9 @@ import com.eit.minimap.network.JsonTcpClient;
 import com.eit.minimap.network.NetworkListener;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,6 +27,9 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
 
     // Cache to store all NetworkListeners before we have a working network.
     private final Set<NetworkListener> listenerCache = new HashSet<NetworkListener>();
+
+    // Cache to store messages if connection is down
+    private final List<JSONObject> packageCache = new ArrayList<JSONObject>();
 
     public HardwareManager(Context context) {
         this.context = context;
@@ -62,6 +67,8 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
     public void sendPackage(JSONObject object) {
         if(networkClient != null) {
             networkClient.sendData(object);
+        } else { //Connection down. Cache package.
+            packageCache.add(object);
         }
     }
 
@@ -80,6 +87,11 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
         for(NetworkListener listener : listenerCache) {
             client.addListener(listener);
         }
+        // Send cached packages.
+        for(JSONObject obj : packageCache) {
+            client.sendData(obj);
+        }
+        packageCache.clear();
     }
 
     public NetworkState getState() { return state; }
