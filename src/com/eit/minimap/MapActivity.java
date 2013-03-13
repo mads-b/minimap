@@ -143,17 +143,15 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.toggleScrubbing:
-                timeScrubbingActivated ^= true;
-                // Iterate over all users, making or adding "tail" depending on time scrubbing toggle.
-                for(User user : userStore.getUsers()) {
-                    if(timeScrubbingActivated)
-                        user.makePolyline(this.map);
-                    else
-                        user.removePolyline();
-                }
-                break;
+        if (item.getItemId() == R.id.toggleScrubbing) {
+            timeScrubbingActivated ^= true;
+            // Iterate over all users, making or adding "tail" depending on time scrubbing toggle.
+            for(User user : userStore.getUsers()) {
+                if(timeScrubbingActivated)
+                    user.makePolyline(this.map);
+                else
+                    user.removePolyline();
+            }
         }
         return true;
     }
