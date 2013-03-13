@@ -184,7 +184,8 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         return true;
     }
 
-    public void messageReceived(MessageHandler msgHandler){
+    @Override
+	public void messageReceived(MessageHandler msgHandler){
         //Show message on screen?
 
     }

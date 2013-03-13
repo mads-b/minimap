@@ -1,8 +1,10 @@
 package com.eit.minimap.network;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 import com.eit.minimap.R;
@@ -22,6 +24,7 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     private final TcpClientRecipient recipient;
     private final Resources res;
     private JsonTcpClient client;
+    private Context c;
 
     private final static int CONNECTION_CHECK_TIMEOUT_MS = 10000;
     private final static String TAG = "com.eit.minimap.network.ClientConnectThread";
@@ -29,6 +32,7 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     public ClientConnectThread(Context c, TcpClientRecipient recipient) {
         this.recipient = recipient;
         this.res=c.getResources();
+        this.c = c;
     }
 
     @Override
@@ -39,8 +43,10 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     protected String doInBackground(Void... params) {
             /* Here we try to see if we can open a TCP socket to our host. */
         try {
-            String serverUri = res.getString(R.string.server_uri);
-            int serverPort = res.getInteger(R.integer.server_port);
+        	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
+            
+            String serverUri = preferences.getString("serverAdr","spoon.orakel.ntnu.no");
+            int serverPort = preferences.getInt("serverPort", 1337);
 
             InetAddress serverAddr = InetAddress.getByName(serverUri);
             if(!serverAddr.isReachable(CONNECTION_CHECK_TIMEOUT_MS)) {
