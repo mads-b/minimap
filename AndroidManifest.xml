@@ -36,5 +36,7 @@
     <activity
         android:name="com.eit.minimap.MapActivity"
         android:configChanges="orientation" />
+    <activity
+        android:name="com.eit.minimap.SettingsActivity"/>
   </application>
 </manifest>
