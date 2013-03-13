@@ -88,8 +88,4 @@ public class JsonTcpClient {
             listener.onPackageReceived(json);
         }
     }
-
-    public int getPort() {
-        return socket.getPort();
-    }
 }

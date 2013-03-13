@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.eit.minimap.datastructures.Message;
 import com.eit.minimap.datastructures.MessageHandler;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
@@ -76,9 +77,20 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         // Make HardwareManager start setting up positioning and networking.
         hardwareManager.init();
 
-        userStore = new UserStore(hardwareManager, PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name"));
+        String ourScreenName = PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name");
+        userStore = new UserStore(hardwareManager,ourScreenName);
         // Listen for changes in user data.
         userStore.registerListener(this);
+
+        //Make our MessageHandler
+        messageHandler = new MessageHandler(hardwareManager);
+
+        //Listen for messages
+        messageHandler.registerListener(this);
+
+        //TODO: Test message to verify chat functionality. Remove this.
+        messageHandler.addMessage(new Message("Hello, this is a test message to ourselves.",hardwareManager.getMacAddress(),System.currentTimeMillis()));
+
         // Sets up a thread to periodically check what state the network is in.
         getNetworkStatePeriodically();
     }
@@ -88,8 +100,9 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         // Action bar inflation
         new MenuInflater(this).inflate(R.menu.action_menu,menu);
         progressBar = menu.findItem(R.id.connection_progress);
-        // Listen for events when time scrubbing is selected.
+        // Listen for events when tools are selected.
         menu.findItem(R.id.toggleScrubbing).setOnMenuItemClickListener(this);
+        menu.findItem(R.id.chatDialog).setOnMenuItemClickListener(this);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -136,33 +149,36 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
 
     private void getNetworkStatePeriodically() {
         new Thread(new Runnable() {
+            Runnable check = new Runnable() {
+                @Override
+                public void run() {
+                    switch (hardwareManager.getState()) {
+                        case CONNECTING:
+                            progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
+                            break;
+                        case CONNECTED:
+                            progressBar.setActionView(null);
+                            progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
+                            break;
+                        case DISCONNECTED:
+                            progressBar.setActionView(null);
+                            progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
+                            break;
+                    }
+                }
+            };
+
             @Override
             public void run() {
                 while(true) {
                     HardwareManager.NetworkState newState = hardwareManager.getState();
-                    if(lastState == newState || progressBar == null) continue; // No need to update.
-                    lastState = newState;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (hardwareManager.getState()) {
-                                case CONNECTING:
-                                    progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
-                                    break;
-                                case CONNECTED:
-                                    progressBar.setActionView(null);
-                                    progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
-                                    break;
-                                case DISCONNECTED:
-                                    progressBar.setActionView(null);
-                                    progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
-                                    break;
-                            }
-                        }
-                    });
-                    //Check network state every .5 seconds.
+                    if(lastState != newState && progressBar != null) {
+                        lastState = newState;
+                        runOnUiThread(check);
+                    }
+                    //Check network state every second.
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ignored) {}
                 }
             }
@@ -172,6 +188,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.toggleScrubbing) {
+            Log.d(TAG,"Toggled time scrubbing");
             timeScrubbingActivated ^= true;
             // Iterate over all users, making or adding "tail" depending on time scrubbing toggle.
             for(User user : userStore.getUsers()) {
@@ -181,11 +198,15 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
                     user.removePolyline();
             }
         }
+        else if(item.getItemId() == R.id.chatDialog) {
+            new ChatDialog(this,userStore,messageHandler);
+            Log.d(TAG,"Showing Chat Dialog");
+        }
         return true;
     }
 
     @Override
-	public void messageReceived(MessageHandler msgHandler){
+    public void messageReceived(MessageHandler msgHandler){
         //Show message on screen?
 
     }

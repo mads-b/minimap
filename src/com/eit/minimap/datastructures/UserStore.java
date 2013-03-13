@@ -114,6 +114,10 @@ public class UserStore implements NetworkListener,LocationListener {
         return Collections.unmodifiableCollection(users.values());
     }
 
+    public User getUserWithMac(String mac) {
+        return users.get(mac);
+    }
+
     public void registerListener(UserStoreListener listener) {
         this.listener=listener;
     }

@@ -38,7 +38,7 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
 
     public void init() {
         // Init networking.
-        new ClientConnectThread(context,this).execute();
+        new ClientConnectThread(context,this,0).execute();
         state = NetworkState.CONNECTING;
 
         // Init GPS. Does not start polling for updates.
@@ -78,10 +78,7 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
             //Connection failed. Try again in five seconds.
             Toast.makeText(context,error,Toast.LENGTH_SHORT).show();
             state = NetworkState.DISCONNECTED;
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {}
-            new ClientConnectThread(context,this).execute();
+            new ClientConnectThread(context,this,5000).execute();
 
             return; //Failed. return.
         }

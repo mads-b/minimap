@@ -19,4 +19,8 @@ public class Message {
     public String getSenderMacAddr() {
         return senderMcAddr;
     }
+
+    public long getTimestamp() {
+        return timeMessageReceived;
+    }
 }

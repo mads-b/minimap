@@ -10,8 +10,8 @@
           android:id="@+id/toggleScrubbing"
           android:title="Toggle Time Scrubbing" />
       <item
-          android:id="@+id/menuSortRating"
-          android:title="More features.." />
+          android:id="@+id/chatDialog"
+          android:title="Instant Messages" />
     </menu>
   </item>
 

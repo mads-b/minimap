@@ -27,7 +27,7 @@ public class User {
     private final List<Coordinate> positions = new ArrayList<Coordinate>();
 
 
-    User(String macAddr, String screenName){
+    public User(String macAddr, String screenName){
         this.macAddr = macAddr;
         this.screenName = screenName;
         //TODO: Make unique colors for every user.
