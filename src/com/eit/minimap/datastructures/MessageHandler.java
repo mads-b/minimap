@@ -68,11 +68,6 @@ public class MessageHandler implements NetworkListener {
     }
 
     public void sendMessage(Message msg) {
-        JSONObject packet = new JSONObject();
-        try {
-            packet = msg.toJson();
-        } catch (JSONException ignored) {}
-        manager.sendPackage(packet);
-
+        manager.sendPackage(msg.toJson());
     }
 }

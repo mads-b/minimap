@@ -47,11 +47,14 @@ public class Message {
         return timeMessageReceived;
     }
 
-    public JSONObject toJson() throws JSONException {
-        return new JSONObject()
-                .put("type", "msg")
-                .put("message",message)
-                .put("macAddr",senderMcAddr)
-                .put("destAddr",recipientMcAddr);
+    public JSONObject toJson() {
+        try {
+            return new JSONObject()
+                    .put("type", "msg")
+                    .put("message",message)
+                    .put("macAddr",senderMcAddr)
+                    .put("destAddr",recipientMcAddr);
+        } catch (JSONException ignored) {}
+        return null;
     }
 }

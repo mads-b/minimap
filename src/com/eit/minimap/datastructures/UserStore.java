@@ -43,8 +43,7 @@ public class UserStore implements NetworkListener,LocationListener {
 
         timeSinceLastSentPacket = 0;
         //sending pInfo packet to server
-        JSONObject pInfoPacket = costructPInfoPacket();
-        hardwareManager.sendPackage(pInfoPacket);
+        hardwareManager.sendPackage(myUser.toJson());
 
     }
 
@@ -65,7 +64,7 @@ public class UserStore implements NetworkListener,LocationListener {
             }
             // Got user information
             else if(type.equals("pInfo")){
-                User newUser = new User(mcAdr,pack.getString("screenName"));
+                User newUser = new User(pack);
                 users.put(newUser.getMacAddr(), newUser);
                 Log.d(TAG,"Added new user with name "+newUser.getScreenName()+" and MAC "+newUser.getMacAddr());
                 if(listener!=null) {
@@ -138,21 +137,6 @@ public class UserStore implements NetworkListener,LocationListener {
          * @param user The user in question.
          */
         void userChanged(User user);
-    }
-
-    JSONObject costructPInfoPacket(){
-        try{
-            JSONObject pInfoPacket = new JSONObject();
-            pInfoPacket.put("type", "pInfo");
-            pInfoPacket.put("macAddr", myUser.getMacAddr());
-            pInfoPacket.put("screenName",myUser.getScreenName());
-            //Need to add screenName and AvatarImage
-            return pInfoPacket;
-        }catch(JSONException error){
-            Log.e(TAG,"Error parsing JSON.",error);
-            return null;
-
-        }
     }
 
     /*

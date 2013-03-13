@@ -1,10 +1,13 @@
 package com.eit.minimap.datastructures;
 
 import android.graphics.Color;
+import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +37,11 @@ public class User {
         polylineOptions.color(Color.GREEN);
     }
 
+    public User(JSONObject json) throws JSONException {
+        macAddr = json.getString("macAddr");
+        screenName = json.getString("screenName");
+    }
+
     public String getMacAddr(){
         return macAddr;
     }
@@ -60,6 +68,17 @@ public class User {
     public Coordinate getPosition() {
         if(positions.size()!=0)
             return positions.get(positions.size()-1);
+        return null;
+    }
+
+    public JSONObject toJson() {
+        try{
+            return new JSONObject()
+                    .put("type", "pInfo")
+                    .put("macAddr", macAddr)
+                    .put("screenName", screenName);
+            //Need to add screenName and AvatarImage
+        } catch (JSONException ignored) {}
         return null;
     }
 
