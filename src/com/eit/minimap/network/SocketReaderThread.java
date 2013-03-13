@@ -34,6 +34,7 @@ class SocketReaderThread extends Thread {
         while(running) {
             try {
                 data = inputReader.readLine();
+                if(data==null) continue;
                 JSONObject json = new JSONObject(data);
                 receiver.receiveData(json);
             } catch (IOException e) {

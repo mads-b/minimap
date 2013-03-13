@@ -75,8 +75,12 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
     @Override
     public void receiveTcpClient(JsonTcpClient client, String error) {
         if(client == null) {
-            //Connection failed. Try again.
+            //Connection failed. Try again in five seconds.
             Toast.makeText(context,error,Toast.LENGTH_SHORT).show();
+            state = NetworkState.DISCONNECTED;
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {}
             new ClientConnectThread(context,this).execute();
 
             return; //Failed. return.
@@ -92,6 +96,7 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
             client.sendData(obj);
         }
         packageCache.clear();
+        this.state = NetworkState.CONNECTED;
     }
 
     public NetworkState getState() { return state; }

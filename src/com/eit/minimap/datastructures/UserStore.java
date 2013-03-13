@@ -67,6 +67,7 @@ public class UserStore implements NetworkListener,LocationListener {
             else if(type.equals("pInfo")){
                 User newUser = new User(mcAdr,pack.getString("screenName"));
                 users.put(newUser.getMacAddr(), newUser);
+                Log.d(TAG,"Added new user with name "+newUser.getScreenName()+" and MAC "+newUser.getMacAddr());
                 if(listener!=null) {
                     listener.userChanged(this, newUser);
                 }
@@ -82,7 +83,7 @@ public class UserStore implements NetworkListener,LocationListener {
                 Log.e(TAG,"Received unknown packet or failed to receive packet. Contents: "+pack.toString());
             }
         }catch(JSONException error){
-            Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
+            Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString(),error);
         }
     }
 
@@ -96,6 +97,9 @@ public class UserStore implements NetworkListener,LocationListener {
 
         if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
             JSONObject posPacket = coord.convertToJSON();
+            try {
+                posPacket.put("macAddr",myUser.getMacAddr());
+            } catch (JSONException ignored) {}
             // Send new user position
             hardwareManager.sendPackage(posPacket);
             timeSinceLastSentPacket = System.currentTimeMillis();
@@ -129,12 +133,13 @@ public class UserStore implements NetworkListener,LocationListener {
          */
         void userChanged(UserStore store, User user);
     }
-    
+
     public JSONObject costructPInfoPacket(){
         try{
             JSONObject pInfoPacket = new JSONObject();
             pInfoPacket.put("type", "pInfo");
             pInfoPacket.put("macAddr", myUser.getMacAddr());
+            pInfoPacket.put("screenName",myUser.getScreenName());
             //Need to add screenName and AvatarImage
             return pInfoPacket;
         }catch(JSONException error){

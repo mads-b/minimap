@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">minimap</string>
-  <string name="server_uri">255.255.255.0</string> <!-- TODO: Fix when we have server up -->
+  <string name="server_uri">spoon.orakel.ntnu.no</string> <!-- TODO: Fix when we have server up -->
   <integer name="server_port">1337</integer>
 </resources>

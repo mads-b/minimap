@@ -94,24 +94,44 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
 
     @Override
-    public void userPositionChanged(UserStore store, User user) {
+    public void userPositionChanged(final UserStore store, final User user) {
         //Remake polyline if time scrubbing is activated.
-        if(timeScrubbingActivated)
-            user.makePolyline(this.map);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                user.updateMarker();
+            }
+        });
+
+        if(timeScrubbingActivated) {
+            final GoogleMap thismap = this.map;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    user.makePolyline(thismap);
+                }
+            });
+        }
     }
 
     @Override
-    public void userChanged(UserStore store, User user) {
-        if(user.getPosition() == null) { // A user without a position is a new user!
-            //Make a marker for the user. No position, as one is not available. User fixes this himself.
-            user.setMarker(map.addMarker(new MarkerOptions()));
+    public void userChanged(final UserStore store, final User user) {
+        final String connectMsg = this.getString(R.string.user_connected, user.getScreenName());
+        final String disconnectMsg = this.getString(R.string.user_disconnected, user.getScreenName());
+        final Context context = this;
 
-            String connectMsg = this.getString(R.string.user_connected, user.getScreenName());
-            Toast.makeText(this,connectMsg,Toast.LENGTH_LONG);
-        } else { // Second case: If he has a position, he is in the process of disconnecting.
-            String disconnectMsg = this.getString(R.string.user_disconnected, user.getScreenName());
-            Toast.makeText(this,disconnectMsg,Toast.LENGTH_LONG);
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(user.getPosition() == null) { // A user without a position is a new user!
+                    //Make a marker for the user. No position, as one is not available. User fixes this himself.
+                    user.setMarker(map.addMarker(new MarkerOptions().position(new LatLng(0,0))));
+                    Toast.makeText(context,connectMsg,Toast.LENGTH_LONG).show();
+                } else { // Second case: If he has a position, he is in the process of disconnecting.
+
+                    Toast.makeText(context,disconnectMsg,Toast.LENGTH_LONG).show();
+                }
+            }});
     }
 
     private void getNetworkStatePeriodically() {
@@ -122,20 +142,24 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
                     HardwareManager.NetworkState newState = hardwareManager.getState();
                     if(lastState == newState || progressBar == null) continue; // No need to update.
                     lastState = newState;
-
-                    switch (hardwareManager.getState()) {
-                        case CONNECTING:
-                            progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
-                            break;
-                        case CONNECTED:
-                            progressBar.setActionView(null);
-                            progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
-                            break;
-                        case DISCONNECTED:
-                            progressBar.setActionView(null);
-                            progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
-                            break;
-                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (hardwareManager.getState()) {
+                                case CONNECTING:
+                                    progressBar.setActionView(R.layout.actionbar_indeterminate_progress);
+                                    break;
+                                case CONNECTED:
+                                    progressBar.setActionView(null);
+                                    progressBar.setIcon(getResources().getDrawable(R.drawable.check_mark));
+                                    break;
+                                case DISCONNECTED:
+                                    progressBar.setActionView(null);
+                                    progressBar.setIcon(getResources().getDrawable(R.drawable.x_mark));
+                                    break;
+                            }
+                        }
+                    });
                     //Check network state every .5 seconds.
                     try {
                         Thread.sleep(500);
@@ -159,9 +183,9 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         }
         return true;
     }
-    
+
     public void messageReceived(MessageHandler msgHandler){
         //Show message on screen?
-        
+
     }
 }

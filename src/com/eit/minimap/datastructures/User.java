@@ -45,18 +45,6 @@ public class User {
     public void addPosition(Coordinate pos) {
         //TODO: Contemplate removing old elements from list if we have too many here.
         positions.add(pos);
-        if(marker != null) {
-            //Move our marker
-            marker.setPosition(pos.getLatLng());
-
-            //Add some text to the onClick bubble to show how long it is since this user provided a coordinate.
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:MM:ss");
-            String time = simpleDateFormat.format(new Date(pos.getTimestamp()));
-            marker.setSnippet("Last seen: "+time);
-        }
-
-
-
         //Update polyline data:
         polylineOptions.add(pos.getLatLng());
     }
@@ -88,11 +76,29 @@ public class User {
     /**
      * Removes old polyline and makes another and adds it to the provided map.
      * This is the only way to edit it.
+     * MUST BE CALLED FROM UI THREAD!
      * @param map Map to add polyline to.
      */
     public void makePolyline(GoogleMap map) {
         removePolyline();
         polyline = map.addPolyline(polylineOptions);
+    }
+
+    /**
+     * Updates the marker to use last position and timestamp
+     * MUST BE CALLED FROM UI THREAD!
+     */
+    public void updateMarker() {
+        if(marker != null) {
+            Coordinate pos = positions.get(positions.size()-1);
+            //Move our marker
+            marker.setPosition(pos.getLatLng());
+
+            //Add some text to the onClick bubble to show how long it is since this user provided a coordinate.
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:MM:ss");
+            String time = simpleDateFormat.format(new Date(pos.getTimestamp()));
+            marker.setSnippet("Last seen: "+time);
+        }
     }
 
     /**
