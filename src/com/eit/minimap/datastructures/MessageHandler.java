@@ -1,18 +1,14 @@
 package com.eit.minimap.datastructures;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import android.util.Log;
+import com.eit.minimap.HardwareManager;
+import com.eit.minimap.network.NetworkListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.eit.minimap.HardwareManager;
-import com.eit.minimap.datastructures.UserStore.UserStoreListener;
-import com.eit.minimap.network.NetworkListener;
-import com.google.android.gms.maps.model.LatLng;
-
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MessageHandler implements NetworkListener {
 

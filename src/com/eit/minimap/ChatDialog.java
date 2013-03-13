@@ -1,20 +1,14 @@
 package com.eit.minimap;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.eit.minimap.datastructures.Message;
@@ -25,14 +19,12 @@ import com.eit.minimap.datastructures.UserStore;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * TODO: Javadoc!
+ * Instantiating this class brings up the chat panel.
  */
-public class ChatDialog extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class ChatDialog implements AdapterView.OnItemSelectedListener {
     private final View dialog;
     private final MessageHandler messageHandler;
     private final UserStore userStore;

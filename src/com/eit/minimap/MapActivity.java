@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.eit.minimap.datastructures.Message;
 import com.eit.minimap.datastructures.MessageHandler;
 import com.eit.minimap.datastructures.User;
