@@ -1,6 +1,7 @@
 package com.eit.minimap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -29,6 +30,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_menu);
+        
         Button ok = (Button) findViewById(R.id.ok_button);
         ok.setOnClickListener(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -65,6 +67,9 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
             .putBoolean("viewMessges", this.viewStaus.isChecked())
             .putBoolean("viewUsers", this.viewStaus.isChecked())
             .commit();
+	        // Go to next activity!
+	        Intent myIntent = new Intent(this, MapActivity.class);
+	        startActivity(myIntent);
 		}
 	}
 }

@@ -25,6 +25,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.main_menu);
         Button joinButton = (Button) findViewById(R.id.join_group);
         joinButton.setOnClickListener(this);
+        Button settingsButton = (Button) findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(this);
 
         groupName = (EditText) findViewById(R.id.group_name);
         yourName = (EditText) findViewById(R.id.your_name);
@@ -39,6 +41,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
      */
     @Override
     public void onClick(View v) {
+    	if(v.getId() == R.id.settings_button){
+    		Intent SettingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(SettingsIntent);
+            return;
+    	}
         String groupNameStr = groupName.getText().toString();
         String yourNameStr = yourName.getText().toString();
         // Error if some fields are empty
