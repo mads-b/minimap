@@ -1,17 +1,36 @@
 package com.eit.minimap.datastructures;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Message {
-    private String message;
+    private final String message;
 
-    private String senderMcAddr;
+    private final String senderMcAddr;
 
-    private long timeMessageReceived;
+    private final String recipientMcAddr;
 
-    public Message(String message, String senderMcAddr, long timeMessageReceived){
+    private final long timeMessageReceived;
+
+    public Message(
+            String message,
+            String senderMcAddr,
+            String recipientMcAddr,
+            long timeMessageReceived){
         this.message = message;
         this.senderMcAddr = senderMcAddr;
-        this. timeMessageReceived = timeMessageReceived;
+        this.recipientMcAddr = recipientMcAddr;
+        this.timeMessageReceived = timeMessageReceived;
     }
+
+    public Message(JSONObject json) throws JSONException {
+        this(json.getString("message"),
+                json.getString("macAddr"),
+                json.getString("destAddr"),
+                System.currentTimeMillis());
+    }
+
+
     public String getMessage(){
         return message;
     }
@@ -20,7 +39,19 @@ public class Message {
         return senderMcAddr;
     }
 
+    public String getRecipientMacAddr() {
+        return recipientMcAddr;
+    }
+
     public long getTimestamp() {
         return timeMessageReceived;
+    }
+
+    public JSONObject toJson() throws JSONException {
+        return new JSONObject()
+                .put("type", "msg")
+                .put("message",message)
+                .put("macAddr",senderMcAddr)
+                .put("destAddr",recipientMcAddr);
     }
 }

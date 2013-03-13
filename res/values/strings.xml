@@ -9,7 +9,7 @@
   <string name="your_name">Your name:</string>
   <string name="join_group">Join Group!</string>
   <string name="settings_button">Advanced settings</string>
-  
+
 
   <!-- Error messages from networker -->
   <string name="error_fields_empty">Error! You have not filled in all the fields!</string>
@@ -34,7 +34,6 @@
   <string name="view_users">View other users on map</string>
   <string name="view_status">View other users status</string>
   <string name="view_messges">Hide message box</string>
-  <string name="Button1">Cansel</string>
   <string name="Button2">Save</string>
 
   <!-- In-app messages -->

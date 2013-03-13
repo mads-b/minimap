@@ -99,6 +99,6 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
     public NetworkState getState() { return state; }
 
     public enum NetworkState  {
-        DISCONNECTED,CONNECTED,CONNECTING;
+        DISCONNECTED,CONNECTED,CONNECTING
     }
 }

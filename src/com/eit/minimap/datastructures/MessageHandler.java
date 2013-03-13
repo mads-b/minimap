@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MessageHandler implements NetworkListener {
 
-    private HardwareManager manager;
+    private final HardwareManager manager;
 
     private MessageHandlerListener listener;
 
@@ -45,15 +45,15 @@ public class MessageHandler implements NetworkListener {
     public void onPackageReceived(JSONObject pack) {
         try{
             String type = pack.getString("type");
-            if(type == "msg"){
-                Message newMsg = new Message(pack.getString("msg"),pack.getString("senderMacAddr"), System.currentTimeMillis());
-                addMessage(newMsg);
+            // TODO: Doesn't check if message is meant for us. Let's hope server does this.
+            if(type.equals("msg")){
+                addMessage(new Message(pack));
                 if(listener!=null) {
                     listener.messageReceived(this);
                 }
             }
         }catch(JSONException error){
-            Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
+            Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString(),error);
         }
     }
 
@@ -66,23 +66,12 @@ public class MessageHandler implements NetworkListener {
 
         void messageReceived(MessageHandler msgHandler);
     }
-    public JSONObject convertToJSON(Message msg, String myMac, String destMac){
-        //if you want to broadcast, send destMac as null
-        try{
-            JSONObject msgPacket = new JSONObject();
-            msgPacket.put("type", "msg");
-            msgPacket.put("msg", msg.getMessage());
-            msgPacket.put("macAddr", myMac);
-            msgPacket.put("destAddr", destMac);
-            return msgPacket;
-        }catch(JSONException error){
-            Log.e(TAG,"Error parsing JSON.",error);
-            return null;
 
-        }
-    }
-    public void sendMessage(Message msg, String myMac, String destMac){
-        JSONObject packet = convertToJSON(msg,myMac, destMac);
+    public void sendMessage(Message msg) {
+        JSONObject packet = new JSONObject();
+        try {
+            packet = msg.toJson();
+        } catch (JSONException ignored) {}
         manager.sendPackage(packet);
 
     }

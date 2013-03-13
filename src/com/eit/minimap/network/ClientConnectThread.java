@@ -23,7 +23,7 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
     private final TcpClientRecipient recipient;
     private final Resources res;
     private JsonTcpClient client;
-    private Context c;
+    private final Context c;
     private final int delayMs;
 
     private final static int CONNECTION_CHECK_TIMEOUT_MS = 10000;

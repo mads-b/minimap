@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,21 +26,38 @@ import java.util.List;
 /**
  * Instantiating this class brings up the chat panel.
  */
-public class ChatDialog implements AdapterView.OnItemSelectedListener {
+public class ChatDialog implements
+        AdapterView.OnItemSelectedListener,
+        View.OnClickListener,
+        MessageHandler.MessageHandlerListener {
     private final View dialog;
     private final MessageHandler messageHandler;
     private final UserStore userStore;
+
+    /*
+     * Here, we're remembering the views we're using..
+     */
+    private final Spinner userSelector;
+    private final ListView messagesList;
+    private final EditText messageField;
+
 
     public ChatDialog(Context context, UserStore users, MessageHandler messageHandler) {
         this.messageHandler = messageHandler;
         this.userStore = users;
 
         dialog = LayoutInflater.from(context).inflate(R.layout.chat_dialog,null);
-        Spinner userSelector = (Spinner) dialog.findViewById(R.id.chat_user_selector);
+        userSelector = (Spinner) dialog.findViewById(R.id.chat_user_selector);
+        messagesList = (ListView) dialog.findViewById(R.id.messages_list);
+        messageField = (EditText) dialog.findViewById(R.id.your_message);
+        Button sendButton = (Button) dialog.findViewById(R.id.message_send_button);
 
         userSelector.setAdapter(new UserAdapter());
-        //Listen to click changes
+        //Listen to click changes to user selection.
         userSelector.setOnItemSelectedListener(this);
+
+        // Listen to clicks on "send" button.
+        sendButton.setOnClickListener(this);
 
         new AlertDialog.Builder(context).setView(dialog).create().show();
     }
@@ -55,8 +74,7 @@ public class ChatDialog implements AdapterView.OnItemSelectedListener {
             messages = messageHandler.getMessagesFrom(selected);
 
         // Populate message list
-        ListView messageListView = (ListView) dialog.findViewById(R.id.messages_list);
-        messageListView.setAdapter(new MessageAdapter(messages));
+        messagesList.setAdapter(new MessageAdapter(messages));
     }
 
     @Override
@@ -65,9 +83,34 @@ public class ChatDialog implements AdapterView.OnItemSelectedListener {
         parent.performItemClick(parent.getChildAt(0),0,0);
     }
 
+    @Override
+    public void onClick(View v) {
+        // Send button clicked. Extract message and recipient
+        String msg = messageField.getText().toString();
+        User selectedUser = (User) userSelector.getSelectedItem();
+
+        // Make new message, and send it!
+        messageHandler.sendMessage(new Message(
+                msg,
+                userStore.getMyUser().getMacAddr(),
+                selectedUser.getMacAddr().equals("everyone") ? null : selectedUser.getMacAddr(),
+                System.currentTimeMillis()));
+        // Clear field so user doesn't spam.
+        messageField.setText("");
+    }
+
+    @Override
+    public void messageReceived(MessageHandler msgHandler) {
+        // Message received. Refresh message list (by artificially clicking at the element we're viewing.)
+        onItemSelected(messagesList,
+                userSelector.getSelectedView(),
+                userSelector.getSelectedItemPosition(),
+                userSelector.getSelectedItemId());
+    }
+
 
     private class MessageAdapter extends BaseAdapter {
-        private List<Message> messages;
+        private final List<Message> messages;
         public MessageAdapter(List<Message> messages) {
             this.messages = messages;
         }

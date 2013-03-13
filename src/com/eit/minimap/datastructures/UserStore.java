@@ -60,7 +60,7 @@ public class UserStore implements NetworkListener,LocationListener {
                 Coordinate newCord = new Coordinate(pack);
                 usr.addPosition(newCord);
                 if(listener!=null) {
-                    listener.userPositionChanged(this, usr);
+                    listener.userPositionChanged(usr);
                 }
             }
             // Got user information
@@ -69,7 +69,7 @@ public class UserStore implements NetworkListener,LocationListener {
                 users.put(newUser.getMacAddr(), newUser);
                 Log.d(TAG,"Added new user with name "+newUser.getScreenName()+" and MAC "+newUser.getMacAddr());
                 if(listener!=null) {
-                    listener.userChanged(this, newUser);
+                    listener.userChanged(newUser);
                 }
             }
             // Got disconnect message.
@@ -77,7 +77,7 @@ public class UserStore implements NetworkListener,LocationListener {
                 User discUser = users.get(mcAdr);
                 users.remove(discUser.getMacAddr());
                 if(listener!=null) {
-                    listener.userChanged(this, discUser);
+                    listener.userChanged(discUser);
                 }
             }else{
                 Log.e(TAG,"Received unknown packet or failed to receive packet. Contents: "+pack.toString());
@@ -106,7 +106,7 @@ public class UserStore implements NetworkListener,LocationListener {
         }
 
         if(listener!=null) {
-            listener.userPositionChanged(this,users.get(myUser.getMacAddr()));
+            listener.userPositionChanged(users.get(myUser.getMacAddr()));
         }
     }
 
@@ -118,6 +118,10 @@ public class UserStore implements NetworkListener,LocationListener {
         return users.get(mac);
     }
 
+    public User getMyUser() {
+        return myUser;
+    }
+
     public void registerListener(UserStoreListener listener) {
         this.listener=listener;
     }
@@ -125,20 +129,18 @@ public class UserStore implements NetworkListener,LocationListener {
     public interface UserStoreListener {
         /**
          * Called when a user position is changed.
-         * @param store This store
          * @param user The user whose position changed
          */
-        void userPositionChanged(UserStore store, User user);
+        void userPositionChanged(User user);
 
         /**
          * Called when a user is added or removed from the store, or otherwise changed.
-         * @param store This store
          * @param user The user in question.
          */
-        void userChanged(UserStore store, User user);
+        void userChanged(User user);
     }
 
-    public JSONObject costructPInfoPacket(){
+    JSONObject costructPInfoPacket(){
         try{
             JSONObject pInfoPacket = new JSONObject();
             pInfoPacket.put("type", "pInfo");

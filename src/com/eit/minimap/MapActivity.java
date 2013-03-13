@@ -88,7 +88,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         messageHandler.registerListener(this);
 
         //TODO: Test message to verify chat functionality. Remove this.
-        messageHandler.addMessage(new Message("Hello, this is a test message to ourselves.",hardwareManager.getMacAddress(),System.currentTimeMillis()));
+        messageHandler.addMessage(new Message("Hello, this is a test message to ourselves.",hardwareManager.getMacAddress(),null,System.currentTimeMillis()));
 
         // Sets up a thread to periodically check what state the network is in.
         getNetworkStatePeriodically();
@@ -106,7 +106,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
 
     @Override
-    public void userPositionChanged(final UserStore store, final User user) {
+    public void userPositionChanged(final User user) {
         //Remake polyline if time scrubbing is activated.
         runOnUiThread(new Runnable() {
             @Override
@@ -127,7 +127,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
 
     @Override
-    public void userChanged(final UserStore store, final User user) {
+    public void userChanged(final User user) {
         final String connectMsg = this.getString(R.string.user_connected, user.getScreenName());
         final String disconnectMsg = this.getString(R.string.user_disconnected, user.getScreenName());
         final Context context = this;
@@ -148,7 +148,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
 
     private void getNetworkStatePeriodically() {
         new Thread(new Runnable() {
-            Runnable check = new Runnable() {
+            final Runnable check = new Runnable() {
                 @Override
                 public void run() {
                     switch (hardwareManager.getState()) {

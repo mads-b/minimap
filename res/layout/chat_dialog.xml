@@ -11,34 +11,28 @@
       android:id="@+id/chat_user_selector"
       />
 
-  <ScrollView
+  <LinearLayout
+      android:orientation="vertical"
       android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:id="@+id/scrollView">
+      android:layout_height="fill_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+
+    <ListView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content"
+        android:id="@+id/messages_list"/>
 
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/your_message"
+        android:id="@+id/your_message"/>
 
-      <ListView
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:id="@+id/messages_list"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:text="@string/message_send"
+        android:id="@+id/message_send_button"/>
 
-      <EditText
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:hint="@string/your_message"
-          android:id="@+id/your_message"/>
-
-      <Button
-          android:layout_width="wrap_content"
-          android:layout_height="fill_parent"
-          android:text="@string/message_send"
-          android:id="@+id/message_send_button"/>
-
-    </LinearLayout>
-  </ScrollView>
+  </LinearLayout>
 </LinearLayout>
