@@ -1,6 +1,7 @@
 package com.eit.minimap.datastructures;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONException;
@@ -14,25 +15,36 @@ import com.google.android.gms.maps.model.LatLng;
 import android.util.Log;
 
 public class MessageHandler implements NetworkListener {
-    
+
     private HardwareManager manager;
-    
+
     private MessageHandlerListener listener;
-    
+
     private final List<Message> messages = new ArrayList<Message>();
-    
+
     private final static String TAG = "com.eit.minimap.network.MessageHandler";
-    
+
     //Need this function? Have to implement it
     public MessageHandler(HardwareManager manager){
         this.manager = manager;
         manager.subscribeToNetworkUpdates(this);
     }
-    
+
     public void addMessage(Message msg){
         messages.add(msg);
     }
-    
+
+    public List<Message> getMessagesFrom(User user) {
+        if(user == null) return Collections.unmodifiableList(messages);
+        List<Message> tempMessages = new ArrayList<Message>();
+        for(Message msg : messages) {
+            if(msg.getSenderMacAddr().equals(user.getMacAddr())) {
+                tempMessages.add(msg);
+            }
+        }
+        return tempMessages;
+    }
+
     //Void atm, should probably return a type Message or something
     public void onPackageReceived(JSONObject pack) {
         try{
@@ -48,14 +60,14 @@ public class MessageHandler implements NetworkListener {
             Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString());
         }
     }
-    
+
     public void registerListener(MessageHandlerListener listener) {
         this.listener=listener;
     }
 
-    
+
     public interface MessageHandlerListener{
-        
+
         void messageReceived(MessageHandler msgHandler);
     }
     public JSONObject convertToJSON(Message msg, String myMac, String destMac){
@@ -76,6 +88,6 @@ public class MessageHandler implements NetworkListener {
     public void sendMessage(Message msg, String myMac, String destMac){
         JSONObject packet = convertToJSON(msg,myMac, destMac);
         manager.sendPackage(packet);
-        
+
     }
 }

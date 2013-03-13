@@ -33,10 +33,12 @@
   <string name="view_messges">Hide message box</string>
   <string name="Button1">Cansel</string>
   <string name="Button2">Save</string>
-  
+
   <!-- In-app messages -->
   <string name="user_connected">User with alias "%1$s" connected!</string>
   <string name="user_disconnected">User with alias "%1$s" has left.</string>
+  <string name="your_message">Your message here..</string>
+  <string name="message_send">Send</string>
 </resources>
 
 
