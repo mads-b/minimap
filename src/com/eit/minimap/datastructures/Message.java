@@ -12,4 +12,7 @@ public class Message {
         this.senderMcAddr = senderMcAddr;
         this. timeMessageReceived = timeMessageReceived;
     }
+    public String getMessage(){
+        return message;
+    }
 }

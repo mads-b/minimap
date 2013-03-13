@@ -7,6 +7,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -75,7 +76,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         // Make HardwareManager start setting up positioning and networking.
         hardwareManager.init();
 
-        userStore = new UserStore(hardwareManager);
+        userStore = new UserStore(hardwareManager, PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name"));
         // Listen for changes in user data.
         userStore.registerListener(this);
         // Sets up a thread to periodically check what state the network is in.
@@ -160,6 +161,7 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
     
     public void messageReceived(MessageHandler msgHandler){
+        //Show message on screen?
         
     }
 }

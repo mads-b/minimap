@@ -24,24 +24,27 @@ public class UserStore implements NetworkListener,LocationListener {
     private final static int MIN_POS_SEND_INTERVAL = 1000;
     private final static String TAG = "com.eit.minimap.datastructures.UserStore";
     /** Mac adress of the phone running this application. */
-    private final String myMac;
+    private final User myUser;
 
     // Handler for Hardware interaction, like network, GPS etc..
     private final HardwareManager hardwareManager;
 
     private long timeSinceLastSentPacket;
 
-    public UserStore(HardwareManager manager){
+    public UserStore(HardwareManager manager, String screenName){
         this.hardwareManager = manager;
-        myMac = manager.getMacAddress();
+        myUser = new User(manager.getMacAddress(), screenName);
         // Subscribe to some data
         manager.subscribeToNetworkUpdates(this);
         manager.subscribeToLocationUpdates(this);
 
         //Add our user!
-        users.put(myMac,new User(myMac,"TODO: Screenname here"));
+        users.put(myUser.getMacAddr(),myUser);
 
         timeSinceLastSentPacket = 0;
+        //sending pInfo packet to server
+        JSONObject pInfoPacket = costructPInfoPacket();
+        hardwareManager.sendPackage(pInfoPacket);
 
     }
 
@@ -89,7 +92,7 @@ public class UserStore implements NetworkListener,LocationListener {
         Coordinate coord = new Coordinate(
                 new LatLng(location.getLatitude(),location.getLongitude()),
                 System.currentTimeMillis());
-        users.get(myMac).addPosition(coord);
+        users.get(myUser.getMacAddr()).addPosition(coord);
 
         if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
             JSONObject posPacket = coord.convertToJSON();
@@ -99,7 +102,7 @@ public class UserStore implements NetworkListener,LocationListener {
         }
 
         if(listener!=null) {
-            listener.userPositionChanged(this,users.get(myMac));
+            listener.userPositionChanged(this,users.get(myUser.getMacAddr()));
         }
     }
 
@@ -125,6 +128,20 @@ public class UserStore implements NetworkListener,LocationListener {
          * @param user The user in question.
          */
         void userChanged(UserStore store, User user);
+    }
+    
+    public JSONObject costructPInfoPacket(){
+        try{
+            JSONObject pInfoPacket = new JSONObject();
+            pInfoPacket.put("type", "pInfo");
+            pInfoPacket.put("macAddr", myUser.getMacAddr());
+            //Need to add screenName and AvatarImage
+            return pInfoPacket;
+        }catch(JSONException error){
+            Log.e(TAG,"Error parsing JSON.",error);
+            return null;
+
+        }
     }
 
     /*

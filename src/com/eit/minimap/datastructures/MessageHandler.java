@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.eit.minimap.HardwareManager;
 import com.eit.minimap.datastructures.UserStore.UserStoreListener;
 import com.eit.minimap.network.NetworkListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import android.util.Log;
 
@@ -56,6 +57,25 @@ public class MessageHandler implements NetworkListener {
     public interface MessageHandlerListener{
         
         void messageReceived(MessageHandler msgHandler);
+    }
+    public JSONObject convertToJSON(Message msg, String myMac, String destMac){
+        //if you want to broadcast, send destMac as null
+        try{
+            JSONObject msgPacket = new JSONObject();
+            msgPacket.put("type", "msg");
+            msgPacket.put("msg", msg.getMessage());
+            msgPacket.put("macAddr", myMac);
+            msgPacket.put("destAddr", destMac);
+            return msgPacket;
+        }catch(JSONException error){
+            Log.e(TAG,"Error parsing JSON.",error);
+            return null;
+
+        }
+    }
+    public void sendMessage(Message msg, String myMac, String destMac){
+        JSONObject packet = convertToJSON(msg,myMac, destMac);
+        manager.sendPackage(packet);
         
     }
 }
