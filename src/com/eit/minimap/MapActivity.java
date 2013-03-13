@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.eit.minimap.datastructures.MessageHandler;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,8 +22,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapActivity extends Activity implements UserStore.UserStoreListener, MenuItem.OnMenuItemClickListener {
+public class MapActivity extends Activity implements UserStore.UserStoreListener, MessageHandler.MessageHandlerListener, MenuItem.OnMenuItemClickListener {
     private UserStore userStore;
+    private MessageHandler messageHandler;
     private GoogleMap map;
     private MenuItem progressBar;
     private HardwareManager hardwareManager;
@@ -154,5 +157,9 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
             }
         }
         return true;
+    }
+    
+    public void messageReceived(MessageHandler msgHandler){
+        
     }
 }
