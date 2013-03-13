@@ -47,7 +47,6 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
             
             String serverUri = preferences.getString("serverAdr","spoon.orakel.ntnu.no");
             int serverPort = preferences.getInt("serverPort", 1337);
-
             InetAddress serverAddr = InetAddress.getByName(serverUri);
             if(!serverAddr.isReachable(CONNECTION_CHECK_TIMEOUT_MS)) {
                 return res.getString(R.string.failed_not_reachable);
