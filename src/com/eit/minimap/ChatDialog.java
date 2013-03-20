@@ -100,7 +100,7 @@ public class ChatDialog implements
     }
 
     @Override
-    public void messageReceived(MessageHandler msgHandler) {
+    public void messageReceived(MessageHandler msgHandler, Message msg) {
         // Message received. Refresh message list (by artificially clicking at the element we're viewing.)
         onItemSelected(messagesList,
                 userSelector.getSelectedView(),
