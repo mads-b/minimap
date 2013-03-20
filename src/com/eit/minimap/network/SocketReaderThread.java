@@ -41,7 +41,7 @@ class SocketReaderThread extends Thread {
                 if(running) {
                     Log.e(TAG,"Error occured while receiving packages",e);
                     // Fatal error. Give up. Socket probably closed.
-                    receiver.stop();
+                    receiver.stop(true);
                 }
             } catch (JSONException e) {
                 Log.e(TAG,"Got mangled JSON from host! Data: "+data,e);
