@@ -1,6 +1,7 @@
 package com.eit.minimap.network;
 
 import android.util.Log;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
@@ -32,18 +33,16 @@ class SocketWriterThread extends Thread {
             Log.e(TAG,"Failed setting up output stream! No connection?",e);
         }
         while(running) {
+            String pack = "";
             try {
-                String pack = packets.take().toString();
+                pack = packets.take().toString();
                 // Write a line, return, and flush.
                 outputWriter.write(pack,0,pack.length());
                 outputWriter.newLine();
                 outputWriter.flush();
             } catch (IOException e) {
-                Log.e(TAG,"Error occured while writing package",e);
-            } catch (InterruptedException e) {
-                Log.d(TAG,"Interrupted while trying to fetch packets from send queue. " +
-                        "Shutting down.. Dropped packets: "+packets.size());
-            }
+                Log.e(TAG,"Error occured while writing package with data: "+pack,e);
+            } catch (InterruptedException ignored) {}
         }
     }
 

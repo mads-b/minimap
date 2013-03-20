@@ -79,8 +79,6 @@ public class MapActivity extends Activity implements
          * Init hardwaremanager. This will cause it to make the connection to the server.
          */
         hardwareManager = new HardwareManager(this);
-        // Make HardwareManager start setting up positioning and networking.
-        hardwareManager.init();
 
         String ourScreenName = PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name");
         userStore = new UserStore(hardwareManager,ourScreenName);
@@ -93,8 +91,8 @@ public class MapActivity extends Activity implements
         //Listen for messages
         messageHandler.registerListener(this);
 
-        //TODO: Test message to verify chat functionality. Remove this.
-        messageHandler.addMessage(new Message("Hello, this is a test message to ourselves.",hardwareManager.getMacAddress(),null,System.currentTimeMillis()));
+        // Make HardwareManager start setting up positioning and networking.
+        hardwareManager.init();
 
         // Sets up a thread to periodically check what state the network is in.
         getNetworkStatePeriodically();
@@ -118,7 +116,7 @@ public class MapActivity extends Activity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                user.updateMarker();
+                user.updateMarker(thismap);
                 if(!timeScrubbingActivated) return;
                 user.makePolyline(thismap);
             }
@@ -135,8 +133,7 @@ public class MapActivity extends Activity implements
             @Override
             public void run() {
                 if(user.getPosition() == null) { // A user without a position is a new user!
-                    //Make a marker for the user. No position, as one is not available. User fixes this himself.
-                    user.setMarker(map.addMarker(new MarkerOptions().position(new LatLng(0,0))));
+                    //Just toast. User handles the marker stuff himself.
                     Toast.makeText(context,connectMsg,Toast.LENGTH_LONG).show();
                 } else { // Second case: If he has a position, he is in the process of disconnecting.
 

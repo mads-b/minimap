@@ -66,6 +66,10 @@ public class UserStore implements NetworkListener,LocationListener {
             }
             // Got user information
             else if(type.equals("pInfo")){
+                Log.d(TAG,"Users: "+users.toString());
+                //Return if we got this user already..
+                if(users.containsKey(mcAdr)) return;
+
                 User newUser = new User(pack);
                 users.put(newUser.getMacAddr(), newUser);
                 Log.d(TAG,"Added new user with name "+newUser.getScreenName()+" and MAC "+newUser.getMacAddr());

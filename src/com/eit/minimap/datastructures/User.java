@@ -3,7 +3,9 @@ package com.eit.minimap.datastructures;
 import android.graphics.Color;
 import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import org.json.JSONException;
@@ -107,18 +109,19 @@ public class User {
      * Updates the marker to use last position and timestamp
      * MUST BE CALLED FROM UI THREAD!
      */
-    public void updateMarker() {
-        if(marker != null) {
-            Coordinate pos = getPosition();
-            //Move our marker
-            marker.setPosition(pos.getLatLng());
-
-            //Add some text to the onClick bubble to show how long it is since this user provided a coordinate.
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-            String time = simpleDateFormat.format(new Date(pos.getTimestamp()));
-            marker.setSnippet("Last seen: "+time);
-            Log.d("com.eit.minimap.datastructures.User","Updating marker. New time: "+time+ " user: "+screenName+" from timestamp: "+pos.getTimestamp());
+    public void updateMarker(GoogleMap map) {
+        if(positions.size()==0) return;
+        Coordinate pos = getPosition();
+        if(marker == null) {
+            setMarker(map.addMarker(new MarkerOptions().position(pos.getLatLng())));
         }
+        //Move our marker
+        marker.setPosition(pos.getLatLng());
+
+        //Add some text to the onClick bubble to show how long it is since this user provided a coordinate.
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        String time = simpleDateFormat.format(new Date(pos.getTimestamp()));
+        marker.setSnippet("Last seen: "+time);
     }
 
     /**
