@@ -1,7 +1,6 @@
 package com.eit.minimap.network;
 
 import android.util.Log;
-import com.eit.minimap.HardwareManager;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ public class JsonTcpClient {
     private SocketReaderThread reader;
     private SocketWriterThread writer;
     private final List<NetworkListener> listeners = new ArrayList<NetworkListener>();
-    private final HardwareManager manager;
 
 
     private static final String TAG = "com.eit.minimap.network.AbstractCommunicator";
@@ -32,10 +30,9 @@ public class JsonTcpClient {
      * Package-private to ensure it's being instantiated by the ClientConnectThread.
      * @param portNum Port to initialize the networker on. 0 is "don't care".
      */
-    JsonTcpClient(InetAddress address,int portNum, HardwareManager manager) {
+    JsonTcpClient(InetAddress address,int portNum) {
         this.address = address;
         this.port = portNum;
-        this.manager = manager;
     }
 
     /**
@@ -53,7 +50,7 @@ public class JsonTcpClient {
         Log.d(TAG,"Networking module running on port "+port);
     }
 
-    public void stop(boolean errorHappened) {
+    public void stop(boolean doRestart) {
         if(reader!=null)
             reader.finishAndStop();
         if(writer!=null)
@@ -66,7 +63,7 @@ public class JsonTcpClient {
             }
         }
         Log.d(TAG,"Networking module stopped. Socket closed.");
-        if(errorHappened) { //Error. Reinitialize network.
+        if(doRestart) { //Error. Reinitialize network.
             Log.d(TAG, "Error happened causing networker to stop. Restarting after 1 second..");
             try {
                 Thread.sleep(1000);

@@ -23,7 +23,11 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapActivity extends Activity implements UserStore.UserStoreListener, MessageHandler.MessageHandlerListener, MenuItem.OnMenuItemClickListener {
+public class MapActivity extends Activity implements
+        UserStore.UserStoreListener,
+        MessageHandler.MessageHandlerListener,
+        MenuItem.OnMenuItemClickListener,
+        GoogleMap.OnMapLongClickListener {
     private UserStore userStore;
     private MessageHandler messageHandler;
     private GoogleMap map;
@@ -56,12 +60,14 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
         final MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         map = mapFrag.getMap();
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        map.setOnMapLongClickListener(this);
 
         // Start of fetching ANY location. Only for centering the map on a logical area.
         LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         final Criteria crit = new Criteria();
         crit.setAccuracy(Criteria.NO_REQUIREMENT);
         final String provider = lm.getBestProvider(crit, true);
+        if(provider == null) return;
         final Location loc = lm.getLastKnownLocation(provider);
         if(loc != null) {
             Log.d(TAG,"AnyLocation: "+loc.getLatitude()+" x "+loc.getLongitude());
@@ -201,5 +207,10 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     public void messageReceived(MessageHandler msgHandler, Message msg){
         String screenName = userStore.getUserWithMac(msg.getSenderMacAddr()).getScreenName();
         Toast.makeText(this,screenName+": "+msg.getMessage(),Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        //TODO: Not implemented!
     }
 }

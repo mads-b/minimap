@@ -68,7 +68,7 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
         if(error!=null) {
             Log.e(TAG,"Connection failed with error: "+error);
             recipient.receiveTcpClient(null,error);
-            if(client!=null) client.stop();
+            if(client!=null) client.stop(false);
             //TODO: Error dialog containing above string. Force user to exit activity.
         } else { //No error to show.
             recipient.receiveTcpClient(client,null);

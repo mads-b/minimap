@@ -2,6 +2,7 @@ package com.eit.minimap.gps;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.widget.Toast;
@@ -31,16 +32,11 @@ public class LocationProcessor {
      * it merely checks for its existence.
      */
     public void initializeProvider() {
-        provider = LocationManager.GPS_PROVIDER;
-        if (!locationManager.isProviderEnabled(provider) && !displayedLocationProviderSelectionScreen) {
+        String gpsProvider = LocationManager.GPS_PROVIDER;
+        if (!locationManager.isProviderEnabled(gpsProvider) && !displayedLocationProviderSelectionScreen) {
             displayedLocationProviderSelectionScreen = true;
             openSettings();
             Toast.makeText(context, R.string.gps_disabled, Toast.LENGTH_LONG).show();
-            if (!locationManager.isProviderEnabled(provider) && !displayedLocationProviderSelectionScreen) {
-                displayedLocationProviderSelectionScreen = true;
-                openSettings();
-                Toast.makeText(context, R.string.gps_disabled, Toast.LENGTH_LONG).show();
-            }
         } else {
             locationManager.addGpsStatusListener(gpsStatusListener);
         }
@@ -69,6 +65,10 @@ public class LocationProcessor {
         float minDistance = 0;
         //Update every second.
         long minTime = 1;
+        // Make a provider that doesn't care about coord quality. GPS should be switched on though.
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.NO_REQUIREMENT);
+        provider = locationManager.getBestProvider(criteria,true);
         locationManager.requestLocationUpdates(provider, minTime, minDistance, listener);
     }
 
