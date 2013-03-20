@@ -198,7 +198,8 @@ public class MapActivity extends Activity implements UserStore.UserStoreListener
     }
 
     @Override
-    public void messageReceived(MessageHandler msgHandler){
-        //Show message on screen?
+    public void messageReceived(MessageHandler msgHandler, Message msg){
+        String screenName = userStore.getUserWithMac(msg.getSenderMacAddr()).getScreenName();
+        Toast.makeText(this,screenName+": "+msg.getMessage(),Toast.LENGTH_LONG);
     }
 }

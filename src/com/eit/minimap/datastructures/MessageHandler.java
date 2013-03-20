@@ -51,10 +51,10 @@ public class MessageHandler implements NetworkListener {
                 String dest = pack.getString("destAddr");
                 // Is it meant for us?
                 if(!dest.equals(manager.getMacAddress())) return;
-
-                addMessage(new Message(pack));
+                Message msg = new Message(pack);
+                addMessage(msg);
                 if(listener!=null) {
-                    listener.messageReceived(this);
+                    listener.messageReceived(this, msg);
                 }
             }
         }catch(JSONException error){
@@ -68,8 +68,7 @@ public class MessageHandler implements NetworkListener {
 
 
     public interface MessageHandlerListener{
-
-        void messageReceived(MessageHandler msgHandler);
+        void messageReceived(MessageHandler msgHandler, Message msg);
     }
 
     public void sendMessage(Message msg) {
