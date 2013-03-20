@@ -30,11 +30,13 @@ public class MessageHandler implements NetworkListener {
         messages.add(msg);
     }
 
-    public List<Message> getMessagesFrom(User user) {
+    public List<Message> getMessagesRelatedTo(User user) {
         if(user == null) return Collections.unmodifiableList(messages);
         List<Message> tempMessages = new ArrayList<Message>();
         for(Message msg : messages) {
-            if(msg.getSenderMacAddr().equals(user.getMacAddr())) {
+            //Add all messages where user provided is sender or recipient.
+            if(        user.getMacAddr().equals(msg.getSenderMacAddr())
+                    || user.getMacAddr().equals(msg.getRecipientMacAddr())) {
                 tempMessages.add(msg);
             }
         }
@@ -75,5 +77,7 @@ public class MessageHandler implements NetworkListener {
 
     public void sendMessage(Message msg) {
         manager.sendPackage(msg.toJson());
+        //Add it to our list also, to show in dialog.
+        addMessage(msg);
     }
 }

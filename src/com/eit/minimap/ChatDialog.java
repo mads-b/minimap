@@ -69,9 +69,9 @@ public class ChatDialog implements
         Log.d("com.eit.minimap.ChatDialog","Selected item number "+position+" user selected is: "+selected.getScreenName());
         List<Message> messages;
         if(selected.getScreenName().equals("Everyone"))
-            messages = messageHandler.getMessagesFrom(null);
+            messages = messageHandler.getMessagesRelatedTo(null);
         else
-            messages = messageHandler.getMessagesFrom(selected);
+            messages = messageHandler.getMessagesRelatedTo(selected);
 
         // Populate message list
         messagesList.setAdapter(new MessageAdapter(messages));
