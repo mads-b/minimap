@@ -204,9 +204,17 @@ public class MapActivity extends Activity implements
     }
 
     @Override
-    public void messageReceived(MessageHandler msgHandler, Message msg){
-        String screenName = userStore.getUserWithMac(msg.getSenderMacAddr()).getScreenName();
-        Toast.makeText(this,screenName+": "+msg.getMessage(),Toast.LENGTH_LONG);
+    public void messageReceived(final MessageHandler msgHandler, final Message msg){
+        final Context context = this;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                User usr = userStore.getUserWithMac(msg.getSenderMacAddr());
+                if(usr==null) return;
+                String screenName = usr.getScreenName();
+                Toast.makeText(context,screenName+": "+msg.getMessage(),Toast.LENGTH_LONG);
+            }
+        });
     }
 
     @Override

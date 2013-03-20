@@ -48,9 +48,11 @@ public class MessageHandler implements NetworkListener {
 
             // Check if this is a message.
             if(type.equals("msg")){
-                String dest = pack.getString("destAddr");
-                // Is it meant for us?
-                if(!dest.equals(manager.getMacAddress())) return;
+                if(pack.has("destAddr")) {
+                    String dest = pack.getString("destAddr");
+                    // Is it meant for us?
+                    if(!dest.equals(manager.getMacAddress())) return;
+                }
                 Message msg = new Message(pack);
                 addMessage(msg);
                 if(listener!=null) {

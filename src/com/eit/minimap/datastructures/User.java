@@ -109,14 +109,15 @@ public class User {
      */
     public void updateMarker() {
         if(marker != null) {
-            Coordinate pos = positions.get(positions.size()-1);
+            Coordinate pos = getPosition();
             //Move our marker
             marker.setPosition(pos.getLatLng());
 
             //Add some text to the onClick bubble to show how long it is since this user provided a coordinate.
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:MM:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
             String time = simpleDateFormat.format(new Date(pos.getTimestamp()));
             marker.setSnippet("Last seen: "+time);
+            Log.d("com.eit.minimap.datastructures.User","Updating marker. New time: "+time+ " user: "+screenName+" from timestamp: "+pos.getTimestamp());
         }
     }
 

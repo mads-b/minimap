@@ -39,7 +39,7 @@ class SocketWriterThread extends Thread {
                 outputWriter.newLine();
                 outputWriter.flush();
             } catch (IOException e) {
-                Log.e(TAG,"Error occured while receiving package",e);
+                Log.e(TAG,"Error occured while writing package",e);
             } catch (InterruptedException e) {
                 Log.d(TAG,"Interrupted while trying to fetch packets from send queue. " +
                         "Shutting down.. Dropped packets: "+packets.size());

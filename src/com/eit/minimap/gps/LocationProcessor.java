@@ -65,11 +65,9 @@ public class LocationProcessor {
         float minDistance = 0;
         //Update every second.
         long minTime = 1;
-        // Make a provider that doesn't care about coord quality. GPS should be switched on though.
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.NO_REQUIREMENT);
-        provider = locationManager.getBestProvider(criteria,true);
-        locationManager.requestLocationUpdates(provider, minTime, minDistance, listener);
+        // Listen to positioning on both network and GPS. When GPS gets a fix, the network updates should stop.
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, listener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDistance, listener);
     }
 
     /**

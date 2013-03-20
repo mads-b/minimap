@@ -70,6 +70,7 @@ public class JsonTcpClient {
                 start();
             } catch (IOException e) {
                 Log.e(TAG,"Error starting network again.",e);
+                stop(true);
             } catch (InterruptedException ignored) {}
         }
     }

@@ -76,8 +76,6 @@ public class UserStore implements NetworkListener,LocationListener {
                 User discUser = users.get(mcAdr);
                 users.remove(discUser.getMacAddr());
                 listener.userChanged(discUser);
-            }else{
-                Log.e(TAG,"Received unknown packet or failed to receive packet. Contents: "+pack.toString());
             }
         }catch(JSONException error){
             Log.e(TAG,"Error! Certain fields missing in received pack (missing MacAddr or type?)\n"+pack.toString(),error);
@@ -90,7 +88,7 @@ public class UserStore implements NetworkListener,LocationListener {
         Coordinate coord = new Coordinate(
                 new LatLng(location.getLatitude(),location.getLongitude()),
                 System.currentTimeMillis());
-        users.get(myUser.getMacAddr()).addPosition(coord);
+        //users.get(myUser.getMacAddr()).addPosition(coord);
 
         if(System.currentTimeMillis()- timeSinceLastSentPacket > MIN_POS_SEND_INTERVAL ){
             JSONObject posPacket = coord.convertToJSON();
@@ -101,8 +99,7 @@ public class UserStore implements NetworkListener,LocationListener {
             hardwareManager.sendPackage(posPacket);
             timeSinceLastSentPacket = System.currentTimeMillis();
         }
-
-        listener.userPositionChanged(users.get(myUser.getMacAddr()));
+        //listener.userPositionChanged(users.get(myUser.getMacAddr()));
     }
 
     public Collection<User> getUsers(){
