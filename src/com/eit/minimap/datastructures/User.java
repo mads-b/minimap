@@ -3,6 +3,8 @@ package com.eit.minimap.datastructures;
 import android.graphics.Color;
 import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -21,6 +23,7 @@ public class User {
     //private Location pos;
     private final String macAddr;
     private final String screenName;
+    private final int icon;
 
     /** GoogleMap marker. */
     private Marker marker;
@@ -32,9 +35,10 @@ public class User {
     private final List<Coordinate> positions = new ArrayList<Coordinate>();
 
 
-    public User(String macAddr, String screenName){
+    public User(String macAddr, String screenName, int icon){
         this.macAddr = macAddr;
         this.screenName = screenName;
+        this.icon = icon;
         //TODO: Make unique colors for every user.
         polylineOptions.color(Color.GREEN);
     }
@@ -42,6 +46,7 @@ public class User {
     public User(JSONObject json) throws JSONException {
         macAddr = json.getString("macAddr");
         screenName = json.getString("screenName");
+        icon = json.getInt("icon");
     }
 
     public String getMacAddr(){
@@ -78,7 +83,8 @@ public class User {
             return new JSONObject()
                     .put("type", "pInfo")
                     .put("macAddr", macAddr)
-                    .put("screenName", screenName);
+                    .put("screenName", screenName)
+                    .put("icon",icon);
             //Need to add screenName and AvatarImage
         } catch (JSONException ignored) {}
         return null;
@@ -113,7 +119,13 @@ public class User {
         if(positions.size()==0) return;
         Coordinate pos = getPosition();
         if(marker == null) {
-            setMarker(map.addMarker(new MarkerOptions().position(pos.getLatLng())));
+            BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(icon);
+
+            setMarker(map.addMarker(
+                    new MarkerOptions()
+                            .position(pos.getLatLng())
+                            .anchor(0.5f, 0.5f)
+                            .icon(bitmap)));
         }
         //Move our marker
         marker.setPosition(pos.getLatLng());

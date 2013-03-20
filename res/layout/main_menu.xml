@@ -11,23 +11,12 @@
       android:text="@string/main_menu"
       android:id="@+id/textView"/>
 
-  <EditText
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:hint="@string/group_name"
-      android:id="@+id/group_name"/>
-  <EditText
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:hint="@string/your_name"
-      android:id="@+id/your_name"/>
-
-    <Button
+  <Button
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:text="@string/settings_button"
       android:id="@+id/settings_button"/>
-  
+
 
   <Button
       android:layout_width="fill_parent"

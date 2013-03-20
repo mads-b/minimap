@@ -6,7 +6,7 @@
   <!--Main menu strings -->
   <string name="main_menu">Welcome to multiplayer maps!</string>
   <string name="group_name">Group Name:</string>
-  <string name="your_name">Your name:</string>
+  <string name="def_your_name">Your name:</string>
   <string name="join_group">Join Group!</string>
   <string name="settings_button">Advanced settings</string>
 
@@ -20,14 +20,13 @@
   <!--Settings menu strings -->
   <string name="user_settings">User settings</string>
   <string name="user_name">Your alias</string>
-    <string name="Icon_prompt">Choose a icon</string>
-    <string-array name="Icon_array">
-        <item>Medic</item>
-        <item>Sniper</item>
-        <item>Idiot</item>
-        <item>Leader</item>
-        <item>Edvin</item>
-    </string-array>
+  <string name="Icon_prompt">Choose a icon</string>
+  <string-array name="Icon_array">
+    <item>Medic</item>
+    <item>Sniper</item>
+    <item>Rifleman</item>
+    <item>Leader</item>
+  </string-array>
   <string name="server_head">Server</string>
   <string name="view_head">View</string>
   <string name="server_adr">Server adress</string>

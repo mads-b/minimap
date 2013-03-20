@@ -46,10 +46,11 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
         viewUsers = (CheckBox) findViewById(R.id.view_users);
 
         // Setting text from preferences to fields
-        yourName.setText(preferences.getString("groupName",""));
-        groupName.setText(preferences.getString("yourName",""));
-        serverAdr.setText(preferences.getString("serverAdr",getResources().getString(R.string.host_addr)));
-        viewStaus.setChecked(preferences.getBoolean("viewStaus",true));
+        yourName.setText(preferences.getString("groupName",getResources().getString(R.string.def_group)));
+        groupName.setText(preferences.getString("yourName",getResources().getString(R.string.def_your_name)));
+        serverAdr.setText(preferences.getString("serverAdr",getResources().getString(R.string.def_host_addr)));
+        iconName.setSelection(preferences.getInt("iconName", getResources().getInteger(R.integer.def_icon_name)));
+        viewStaus.setChecked(preferences.getBoolean("viewStaus", true));
         viewMessges.setChecked(preferences.getBoolean("viewMessges",true));
         viewUsers.setChecked(preferences.getBoolean("viewMessges",false));
 
@@ -62,7 +63,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
 	        preferences.edit()
             .putString("groupName",this.yourName.getText().toString())
             .putString("yourName",this.groupName.getText().toString())
-            .putString("iconName",(String)this.iconName.getSelectedItem())
+            .putInt("iconName", this.iconName.getSelectedItemPosition())
             .putString("serverAdr",this.serverAdr.getText().toString())
             .putBoolean("viewStaus", this.viewStaus.isChecked())
             .putBoolean("viewMessges", this.viewStaus.isChecked())

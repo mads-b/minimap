@@ -162,7 +162,7 @@ public class ChatDialog implements
 
         private UserAdapter() {
             users = new ArrayList<User>();
-            users.add(new User("everyone","Everyone"));
+            users.add(new User("everyone","Everyone",0));
             users.addAll(userStore.getUsers());
         }
 

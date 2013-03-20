@@ -3,6 +3,7 @@ package com.eit.minimap;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -81,11 +82,13 @@ public class MapActivity extends Activity implements
          * Init hardwaremanager. This will cause it to make the connection to the server.
          */
         hardwareManager = new HardwareManager(this);
-
-        String ourScreenName = PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name");
+        // Get some preferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String ourScreenName = prefs.getString("yourName", getResources().getString(R.string.def_your_name));
+        int icon = prefs.getInt("iconName", getResources().getInteger(R.integer.def_icon_name));
 
         //Make Userstore and subscribe to updates
-        userStore = new UserStore(hardwareManager,ourScreenName);
+        userStore = new UserStore(hardwareManager,ourScreenName,UserIcons.ICONS[icon]);
         userStore.registerListener(this);
 
         //Make our MessageHandler and subscribe to updates

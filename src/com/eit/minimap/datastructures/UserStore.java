@@ -3,6 +3,7 @@ package com.eit.minimap.datastructures;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import com.eit.minimap.HardwareManager;
 import com.eit.minimap.network.NetworkListener;
@@ -35,9 +36,10 @@ public class UserStore implements NetworkListener,LocationListener {
 
     private long timeSinceLastSentPacket;
 
-    public UserStore(HardwareManager manager, String screenName){
+    public UserStore(HardwareManager manager, String screenName, int avatarIcon){
         this.hardwareManager = manager;
-        myUser = new User(manager.getMacAddress(), screenName);
+
+        myUser = new User(manager.getMacAddress(), screenName, avatarIcon);
         // Subscribe to some data
         manager.subscribeToNetworkUpdates(this);
         manager.subscribeToLocationUpdates(this);

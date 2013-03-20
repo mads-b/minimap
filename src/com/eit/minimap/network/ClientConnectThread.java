@@ -47,8 +47,8 @@ public class ClientConnectThread extends AsyncTask<Void,Void,String> {
             Thread.sleep(delayMs);
         	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
 
-            String serverUri = preferences.getString("serverAdr", res.getString(R.string.host_addr));
-            int serverPort = preferences.getInt("serverPort", res.getInteger(R.integer.host_ip));
+            String serverUri = preferences.getString("serverAdr", res.getString(R.string.def_host_addr));
+            int serverPort = preferences.getInt("serverPort", res.getInteger(R.integer.def_host_ip));
             InetAddress serverAddr = InetAddress.getByName(serverUri);
             if(!serverAddr.isReachable(CONNECTION_CHECK_TIMEOUT_MS)) {
                 return res.getString(R.string.failed_not_reachable);
