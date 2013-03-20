@@ -23,7 +23,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
 	private CheckBox viewMessges;
 	private CheckBox viewUsers;
 
-    
+
     /**
      * Called when the activity is first created.
      */
@@ -31,11 +31,11 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_menu);
-        
+
         Button ok = (Button) findViewById(R.id.ok_button);
         ok.setOnClickListener(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        
+
         // Get Fields
         groupName = (EditText) findViewById(R.id.group_name);
         yourName = (EditText) findViewById(R.id.your_name);
@@ -44,11 +44,11 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
         viewStaus = (CheckBox) findViewById(R.id.view_status);
         viewMessges = (CheckBox) findViewById(R.id.view_messges);
         viewUsers = (CheckBox) findViewById(R.id.view_users);
-        
+
         // Setting text from preferences to fields
         yourName.setText(preferences.getString("groupName",""));
         groupName.setText(preferences.getString("yourName",""));
-        serverAdr.setText(preferences.getString("serverAdr","spoon.orakel.ntnu.no"));
+        serverAdr.setText(preferences.getString("serverAdr",getResources().getString(R.string.host_addr)));
         viewStaus.setChecked(preferences.getBoolean("viewStaus",true));
         viewMessges.setChecked(preferences.getBoolean("viewMessges",true));
         viewUsers.setChecked(preferences.getBoolean("viewMessges",false));

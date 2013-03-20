@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="host_addr">spoon.orakel.ntnu.no</string>
+  <integer name="host_ip">1337</integer>
+</resources>

@@ -23,7 +23,7 @@ public class JsonTcpClient {
     private final List<NetworkListener> listeners = new ArrayList<NetworkListener>();
 
 
-    private static final String TAG = "com.eit.minimap.network.AbstractCommunicator";
+    private static final String TAG = "com.eit.minimap.network.JsonTcpClient";
 
     /**
      * Constructor for the networker.
