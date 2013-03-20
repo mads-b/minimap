@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import com.eit.minimap.datastructures.Message;
 import com.eit.minimap.datastructures.MessageHandler;
+import com.eit.minimap.datastructures.POI;
+import com.eit.minimap.datastructures.POIHandler;
 import com.eit.minimap.datastructures.User;
 import com.eit.minimap.datastructures.UserStore;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,12 +29,13 @@ public class MapActivity extends Activity implements
         UserStore.UserStoreListener,
         MessageHandler.MessageHandlerListener,
         MenuItem.OnMenuItemClickListener,
-        GoogleMap.OnMapLongClickListener {
+        POIHandler.POIListener {
     private UserStore userStore;
     private MessageHandler messageHandler;
     private GoogleMap map;
     private MenuItem progressBar;
     private HardwareManager hardwareManager;
+    private POIHandler poiHandler;
 
     // Time scrubbing stuff.
     private boolean timeScrubbingActivated = false;
@@ -60,7 +63,6 @@ public class MapActivity extends Activity implements
         final MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         map = mapFrag.getMap();
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        map.setOnMapLongClickListener(this);
 
         // Start of fetching ANY location. Only for centering the map on a logical area.
         LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -81,15 +83,20 @@ public class MapActivity extends Activity implements
         hardwareManager = new HardwareManager(this);
 
         String ourScreenName = PreferenceManager.getDefaultSharedPreferences(this).getString("yourName", "no name");
+
+        //Make Userstore and subscribe to updates
         userStore = new UserStore(hardwareManager,ourScreenName);
-        // Listen for changes in user data.
         userStore.registerListener(this);
 
-        //Make our MessageHandler
+        //Make our MessageHandler and subscribe to updates
         messageHandler = new MessageHandler(hardwareManager);
-
-        //Listen for messages
         messageHandler.registerListener(this);
+
+        //Make Point Of Interest handler and subscribe to updates. Also, give PoiHandler info when markers or map is long clicked.
+        poiHandler = new POIHandler(hardwareManager,this);
+        poiHandler.registerListener(this);
+        map.setOnMarkerClickListener(poiHandler);
+        map.setOnMapLongClickListener(poiHandler);
 
         // Make HardwareManager start setting up positioning and networking.
         hardwareManager.init();
@@ -215,7 +222,13 @@ public class MapActivity extends Activity implements
     }
 
     @Override
-    public void onMapLongClick(LatLng latLng) {
-        //TODO: Not implemented!
+    public void onPoiAdded(final POI poi) {
+        // POI added. Just add the marker.
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                poi.makeMarker(map);
+            }
+        });
     }
 }

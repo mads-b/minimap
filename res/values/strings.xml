@@ -41,6 +41,15 @@
   <string name="user_disconnected">User with alias "%1$s" has left.</string>
   <string name="your_message">Your message here..</string>
   <string name="message_send">Send</string>
+
+  <!-- POI strings -->
+  <string name="add_new_poi">Add new Point of Interest?</string>
+  <string name="add_poi_msg">Purpose of this Point of Interest.</string>
+  <string name="poi_radius">Radius: %1$d</string>
+  <string name="make">Make</string>
+  <string name="delete">Delete</string>
+  <string name="exit">Exit</string>
+
 </resources>
 
 
