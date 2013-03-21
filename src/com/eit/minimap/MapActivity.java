@@ -3,6 +3,7 @@ package com.eit.minimap;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
@@ -23,6 +24,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MapActivity extends Activity implements
         UserStore.UserStoreListener,
@@ -114,6 +117,7 @@ public class MapActivity extends Activity implements
         // Listen for events when tools are selected.
         menu.findItem(R.id.toggleScrubbing).setOnMenuItemClickListener(this);
         menu.findItem(R.id.chatDialog).setOnMenuItemClickListener(this);
+        menu.findItem(R.id.exitApp).setOnMenuItemClickListener(this);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -190,20 +194,25 @@ public class MapActivity extends Activity implements
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        if (item.getItemId() == R.id.toggleScrubbing) {
-            Log.d(TAG,"Toggled time scrubbing");
-            timeScrubbingActivated ^= true;
-            // Iterate over all users, making or adding "tail" depending on time scrubbing toggle.
-            for(User user : userStore.getUsers()) {
-                if(timeScrubbingActivated)
-                    user.makePolyline(this.map);
-                else
-                    user.removePolyline();
-            }
-        }
-        else if(item.getItemId() == R.id.chatDialog) {
-            chat.show();
-            Log.d(TAG,"Showing Chat Dialog");
+        switch(item.getItemId()) {
+            case R.id.toggleScrubbing:
+                Log.d(TAG,"Toggled time scrubbing");
+                timeScrubbingActivated ^= true;
+                // Iterate over all users, making or adding "tail" depending on time scrubbing toggle.
+                for(User user : userStore.getUsers()) {
+                    if(timeScrubbingActivated)
+                        user.makePolyline(this.map);
+                    else
+                        user.removePolyline();
+                }
+                break;
+            case R.id.chatDialog:
+                Log.d(TAG,"Showing Chat Dialog");
+                chat.show();
+                break;
+            case R.id.exitApp:
+                shutdown();
+                break;
         }
         return true;
     }
@@ -217,5 +226,19 @@ public class MapActivity extends Activity implements
                 poi.makeMarker(map);
             }
         });
+    }
+
+    private void shutdown() {
+        Log.d(TAG,"Shutting down the multiplayer map. Notifying all recipients.");
+        try {
+            hardwareManager.sendPackage(new JSONObject()
+                    .put("type", "disc")
+                    .put("macAddr", userStore.getMyUser().getMacAddr()));
+        } catch (JSONException ignored) {}
+        hardwareManager.shutdown();
+        Log.d(TAG,"Hardware deactivated. Changing activity to MainActivity.");
+        // After shutdown, return to main menu.
+        Intent myIntent = new Intent(this, MainActivity.class);
+        startActivity(myIntent);
     }
 }

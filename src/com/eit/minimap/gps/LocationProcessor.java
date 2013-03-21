@@ -73,7 +73,7 @@ public class LocationProcessor {
     /**
      * Stops the GPS.
      */
-    void stopProvider() {
+    public void stopProvider() {
         try{
             locationManager.removeUpdates(listener);
             locationManager.removeGpsStatusListener(gpsStatusListener);

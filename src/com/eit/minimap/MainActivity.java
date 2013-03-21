@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
 /**
  * Activity defining the main menu. Just a few buttons and such.
@@ -25,6 +23,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         joinButton.setOnClickListener(this);
         Button settingsButton = (Button) findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(this);
+        Button quitButton = (Button) findViewById(R.id.quit_button);
+        quitButton.setOnClickListener(this);
     }
 
     /**
@@ -33,6 +33,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
      */
     @Override
     public void onClick(View v) {
+        if(v.getId() == R.id.quit_button) {
+            Intent i = new Intent(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_HOME);
+            startActivity(i);
+        }
         // Starts settings menu
         if(v.getId() == R.id.settings_button){
             Intent SettingsIntent = new Intent(this, SettingsActivity.class);

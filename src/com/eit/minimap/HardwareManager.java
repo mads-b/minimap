@@ -95,6 +95,11 @@ public class HardwareManager implements ClientConnectThread.TcpClientRecipient {
         this.state = NetworkState.CONNECTED;
     }
 
+    public void shutdown() {
+        if(networkClient!=null) networkClient.stop(false);
+        locationProcessor.stopProvider();
+    }
+
     public NetworkState getState() { return state; }
 
     public enum NetworkState  {
