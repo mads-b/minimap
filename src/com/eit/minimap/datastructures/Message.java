@@ -26,7 +26,7 @@ public class Message {
     public Message(JSONObject json) throws JSONException {
         this(json.getString("message"),
                 json.getString("macAddr"),
-                json.getString("destAddr"),
+                json.isNull("destAddr") ? null : json.getString("destAddr"),
                 System.currentTimeMillis());
     }
 

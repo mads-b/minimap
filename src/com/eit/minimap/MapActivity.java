@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.eit.minimap.datastructures.Message;
 import com.eit.minimap.datastructures.MessageHandler;
 import com.eit.minimap.datastructures.POI;
 import com.eit.minimap.datastructures.POIHandler;
@@ -24,15 +23,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapActivity extends Activity implements
         UserStore.UserStoreListener,
-        MessageHandler.MessageHandlerListener,
         MenuItem.OnMenuItemClickListener,
         POIHandler.POIListener {
     private UserStore userStore;
     private MessageHandler messageHandler;
+    private ChatDialogHandler chat;
     private GoogleMap map;
     private MenuItem progressBar;
     private HardwareManager hardwareManager;
@@ -93,7 +91,7 @@ public class MapActivity extends Activity implements
 
         //Make our MessageHandler and subscribe to updates
         messageHandler = new MessageHandler(hardwareManager);
-        messageHandler.registerListener(this);
+        chat = new ChatDialogHandler(this,userStore,messageHandler);
 
         //Make Point Of Interest handler and subscribe to updates. Also, give PoiHandler info when markers or map is long clicked.
         poiHandler = new POIHandler(hardwareManager,this);
@@ -204,24 +202,10 @@ public class MapActivity extends Activity implements
             }
         }
         else if(item.getItemId() == R.id.chatDialog) {
-            new ChatDialog(this,userStore,messageHandler);
+            chat.show();
             Log.d(TAG,"Showing Chat Dialog");
         }
         return true;
-    }
-
-    @Override
-    public void messageReceived(final MessageHandler msgHandler, final Message msg){
-        final Context context = this;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                User usr = userStore.getUserWithMac(msg.getSenderMacAddr());
-                if(usr==null) return;
-                String screenName = usr.getScreenName();
-                Toast.makeText(context,screenName+": "+msg.getMessage(),Toast.LENGTH_LONG);
-            }
-        });
     }
 
     @Override

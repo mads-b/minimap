@@ -50,7 +50,7 @@ public class MessageHandler implements NetworkListener {
 
             // Check if this is a message.
             if(type.equals("msg")){
-                if(pack.has("destAddr")) {
+                if(!pack.isNull("destAddr")) {
                     String dest = pack.getString("destAddr");
                     // Is it meant for us?
                     if(!dest.equals(manager.getMacAddress())) return;
