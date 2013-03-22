@@ -109,6 +109,8 @@ public class MapActivity extends Activity implements
         getNetworkStatePeriodically();
     }
 
+    public GoogleMap getMap() { return map; }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Action bar inflation
@@ -124,13 +126,13 @@ public class MapActivity extends Activity implements
     @Override
     public void userPositionChanged(final User user) {
         //Remake polyline if time scrubbing is activated.
-        final GoogleMap thismap = this.map;
+        final MapActivity t = this;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                user.updateMarker(thismap);
+                user.updateMarker(t);
                 if(!timeScrubbingActivated) return;
-                user.makePolyline(thismap);
+                user.makePolyline(t.getMap());
             }
         });
     }

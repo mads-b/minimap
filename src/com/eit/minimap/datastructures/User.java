@@ -1,7 +1,11 @@
 package com.eit.minimap.datastructures;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
+import com.eit.minimap.MapActivity;
+import com.eit.minimap.UserIcons;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -90,11 +94,7 @@ public class User {
         return null;
     }
 
-    public Marker getMarker() {
-        return marker;
-    }
-
-    public void setMarker(Marker marker) {
+    private void setMarker(Marker marker) {
         this.marker = marker;
         // We'll set marker settings here..
         marker.setTitle(screenName);
@@ -115,17 +115,17 @@ public class User {
      * Updates the marker to use last position and timestamp
      * MUST BE CALLED FROM UI THREAD!
      */
-    public void updateMarker(GoogleMap map) {
+    public void updateMarker(MapActivity map) {
         if(positions.size()==0) return;
         Coordinate pos = getPosition();
         if(marker == null) {
-            BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(icon);
+            Bitmap bmp = UserIcons.makeIconWithText(map.getResources(),icon,screenName);
 
-            setMarker(map.addMarker(
+            setMarker(map.getMap().addMarker(
                     new MarkerOptions()
                             .position(pos.getLatLng())
-                            .anchor(0.5f, 0.5f)
-                            .icon(bitmap)));
+                            .anchor(0.5f, 0.75f)
+                            .icon(BitmapDescriptorFactory.fromBitmap(bmp))));
         }
         //Move our marker
         marker.setPosition(pos.getLatLng());
